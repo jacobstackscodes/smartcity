@@ -1,10 +1,6 @@
 import type { CityData, Location, LocationEntry } from '@/types/requests';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import axios from 'axios';
-
-const genAi = new GoogleGenerativeAI(
-    process.env.GOOGLE_GEMINI_API_KEY as string,
-).getGenerativeModel({ model: 'gemini-2.0-flash' });
+import { genAi } from './utils';
 
 export const fetchCity = async (
     city?: string | null,
@@ -12,20 +8,16 @@ export const fetchCity = async (
     if (!city) return null;
 
     try {
-        const prompt = `Provide the latitude and longitude of the following city: ${city} and its sub-localities in JSON format: [ { "name": "CityName", "type": "city", "location": { "latitude": 0.0, "longitude": 0.0 } }, { "name": "SublocalityName", "type": "sublocality", "location": { "latitude": 0.0, "longitude": 0.0 } } ]`;
-
+        const prompt = `Provide the latitude and longitude of ${city} and its sub-localities in JSON format: [ { "name": "CityName", "type": "city", "location": { "latitude": 0.0, "longitude": 0.0 } }, { "name": "SublocalityName", "type": "sublocality", "location": { "latitude": 0.0, "longitude": 0.0 } } ]. No explanations, just the data.`;
         const { response } = await genAi.generateContent(prompt);
-        try {
-            return JSON.parse(
-                response
-                    .text()
-                    .replace(/```json\n?|```\n?/g, '')
-                    .trim(),
-            );
-        } catch (error) {
-            console.error('Error parsing JSON response:', error);
-            return null;
-        }
+
+        // clean up the response
+        const data = response.text();
+        const cleanText = JSON.parse(
+            data.replace(/```json\n?|```/g, '').trim(),
+        );
+
+        return cleanText;
     } catch (error) {
         console.error('Error fetching city data:', error);
         return null;

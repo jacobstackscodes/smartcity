@@ -3,10 +3,13 @@ import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
     try {
-        const queryCity = request.nextUrl.searchParams.get('city');
-        const _city = await fetchCity(queryCity);
+        const queryCity =
+            request.nextUrl.searchParams.get('city') ?? 'Bangalore';
 
-        return Response.json(_city);
+        // fetch city data via Gemini API
+        const data = await fetchCity(queryCity);
+
+        return Response.json(data, { status: 200 });
     } catch (error) {
         console.error('Error fetching city data:', error);
         if (error instanceof Error) {
