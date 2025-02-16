@@ -26,7 +26,7 @@ export default function RootLayout({
         <html lang="en">
             <body className={cn(inter.className, 'antialiased')}>
                 <Navigation />
-                <main className="wrapper py-16">{children}</main>
+                <main className="relative size-full">{children}</main>
             </body>
         </html>
     );

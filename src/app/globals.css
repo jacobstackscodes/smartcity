@@ -1,19 +1,19 @@
-@import "tailwindcss" source(none);
+@import 'tailwindcss' source(none);
 
 @source "../../src";
 
 @theme {
-	--breakpoint-sm: 576px;
-	--breakpoint-md: 768px;
-	--breakpoint-lg: 992px;
-	--breakpoint-xl: 1200px;
-	--breakpoint-xxl: 1400px;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --breakpoint-xxl: 1400px;
 
-	--color-primary: #007bff;
-	--color-foreground: oklch(7.97% 0.0166 233.51);
-	--color-muted: oklch(92% 0.02 233.51);
-	--color-border: #dee2e6;
-	--color-input: oklch(80% 0.02 233.51);
+    --color-primary: #007bff;
+    --color-foreground: oklch(7.97% 0.0166 233.51);
+    --color-muted: oklch(92% 0.02 233.51);
+    --color-border: #dee2e6;
+    --color-input: oklch(80% 0.02 233.51);
 }
 
 @variant sm (@media screen and (min-width: theme(--breakpoint-sm)));
@@ -23,34 +23,43 @@
 @variant xxl (@media screen and (min-width: theme(--breakpoint-xxl)));
 
 @layer utilities {
-	.wrapper {
-		margin-inline: auto;
-		padding-inline: 1rem;
+    .wrapper {
+        margin-inline: auto;
+        padding-inline: 1rem;
 
-		@variant sm {
-			max-width: 540px;
-		}
+        @variant sm {
+            max-width: 540px;
+        }
 
-		@variant md {
-			max-width: 720px;
-			padding-inline: 2rem;
-		}
+        @variant md {
+            max-width: 720px;
+            padding-inline: 2rem;
+        }
 
-		@variant lg {
-			max-width: 960px;
-		}
+        @variant lg {
+            max-width: 960px;
+        }
 
-		@variant xl {
-			max-width: 1140px;
-		}
+        @variant xl {
+            max-width: 1140px;
+        }
 
-		@variant xxl {
-			max-width: 1320px;
-		}
-	}
+        @variant xxl {
+            max-width: 1320px;
+        }
+    }
+}
+
+@utility search-gradient {
+    background: linear-gradient(
+        to top,
+        oklch(0.623 0.214 259.815 / 20%) 0%,
+        transparent 40%,
+        transparent 100%
+    );
 }
 
 html,
 body {
-	@apply size-full text-foreground bg-white;
+    @apply size-full bg-white text-foreground;
 }
