@@ -12,7 +12,7 @@ export const fetchCity = async (
     if (!city) return null;
 
     try {
-        const prompt = `Provide the latitude and longitude of the following city: ${city} and its sub-localities in JSON format: { "locations": [ { "name": "CityName", "type": "city", "location": { "latitude": 0.0, "longitude": 0.0 } }, { "name": "SublocalityName", "type": "sublocality", "location": { "latitude": 0.0, "longitude": 0.0 } } ] }`;
+        const prompt = `Provide the latitude and longitude of the following city: ${city} and its sub-localities in JSON format: [ { "name": "CityName", "type": "city", "location": { "latitude": 0.0, "longitude": 0.0 } }, { "name": "SublocalityName", "type": "sublocality", "location": { "latitude": 0.0, "longitude": 0.0 } } ]`;
 
         const { response } = await genAi.generateContent(prompt);
         try {
