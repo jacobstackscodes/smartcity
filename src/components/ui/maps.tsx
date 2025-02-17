@@ -36,7 +36,7 @@ const Map: React.FC<{
     const initializeMap = useMemo(() => {
         return async () => {
             if (!mapRef.current) return;
-            const { Map } = await loader.importLibrary('maps');
+            const { Map, RenderingType } = await loader.importLibrary('maps');
             const _map = new Map(mapRef.current, {
                 center: { lat: 12.9716, lng: 77.5946 },
                 zoom: 14,
@@ -45,6 +45,7 @@ const Map: React.FC<{
                 disableDefaultUI: true,
                 clickableIcons: false,
                 mapId: '67af307b850dc59d',
+                renderingType: RenderingType.VECTOR,
             });
 
             setMap(_map);
