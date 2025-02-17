@@ -42,8 +42,6 @@ const Map: React.FC<{
                 zoom: 14,
                 mapTypeControl: false,
                 streetViewControl: false,
-                zoomControl: false,
-                draggable: false,
                 disableDefaultUI: true,
                 clickableIcons: false,
                 mapId: '67af307b850dc59d',
@@ -55,6 +53,10 @@ const Map: React.FC<{
 
     useEffect(() => {
         initializeMap();
+
+        return () => {
+            mapRef.current = null; // Reset on unmount
+        };
     }, [initializeMap]);
 
     return (
