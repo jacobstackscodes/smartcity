@@ -3,8 +3,13 @@
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import debounce from 'lodash.debounce';
 import { useCallback } from 'react';
+import { cn } from '@/lib/utils';
 
-export const Search = () => {
+type Props = {
+    className?: string;
+};
+
+export const Search = ({ className }: Props) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -29,9 +34,12 @@ export const Search = () => {
 
     return (
         <input
-            className="h-12 w-full rounded-t-xl px-4 py-2 transition-[box-shadow] duration-300 outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+            className={cn(
+                'h-10 w-full rounded-lg px-4 py-2 text-sm transition-[box-shadow] duration-300 outline-none focus:ring-2 focus:ring-black focus:ring-inset',
+                className,
+            )}
             type="text"
-            placeholder="Search..."
+            placeholder="Search city or locality..."
             onChange={(e) => {
                 onSearch(e.target.value);
             }}

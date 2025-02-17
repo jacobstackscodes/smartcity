@@ -44,10 +44,11 @@ const Map: React.FC<{
                 streetViewControl: false,
                 zoomControl: false,
                 draggable: false,
-                scrollwheel: false,
-                panControl: false,
+                disableDefaultUI: true,
+                clickableIcons: false,
                 mapId: '67af307b850dc59d',
             });
+            
             setMap(_map);
         };
     }, [setMap, mapRef]);
