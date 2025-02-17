@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import './globals.css';
-import { cn } from '@/lib/utils';
 import { Navigation } from '@/components/navigation';
+import { cn } from '@/lib/utils';
+import './globals.css';
+import 'remixicon/fonts/remixicon.css';
 
 const inter = Inter({
     variable: '--font-inter',

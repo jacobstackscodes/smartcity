@@ -1,7 +1,7 @@
 'use client';
 
 import { Loader } from '@googlemaps/js-api-loader';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 import { create } from 'zustand';
 
 interface MapStore {
@@ -46,7 +46,7 @@ const Map: React.FC<{
                 clickableIcons: false,
                 mapId: '67af307b850dc59d',
             });
-            
+
             setMap(_map);
         };
     }, [setMap, mapRef]);
@@ -57,7 +57,7 @@ const Map: React.FC<{
         return () => {
             mapRef.current = null; // Reset on unmount
         };
-    }, [initializeMap]);
+    }, [initializeMap, mapRef]);
 
     return (
         <div
@@ -91,4 +91,59 @@ const AdvancedMarker: React.FC<{
     return null;
 };
 
-export { Map, AdvancedMarker };
+const Heatmap: React.FC = () => {
+    const { map } = useMapStore();
+
+    const renderHeatmap = useCallback(
+        (tiles) => {
+            if (!map) return;
+
+            const tileLayer = new google.maps.ImageMapType({
+                getTileUrl: (coord, zoom) => {
+                    const tile = tiles.find(
+                        (t) => t.x === coord.x && t.y === coord.y,
+                    );
+                    return tile ? tile.url : null;
+                },
+                tileSize: new google.maps.Size(256, 256),
+                opacity: 0.6,
+            });
+
+            map.overlayMapTypes.clear();
+            map.overlayMapTypes.push(tileLayer);
+        },
+        [map],
+    );
+
+    useEffect(() => {
+        if (!map) return;
+
+        const updateHeatmapTiles = async () => {
+            const zoom = map.getZoom();
+            const bounds = map.getBounds();
+            if (!bounds) return;
+
+            const ne = bounds.getNorthEast(); // Top-right corner
+            const sw = bounds.getSouthWest(); // Bottom-left corner
+
+            console.log('Fetching heatmap tiles for:', {
+                zoom,
+                ne: { lat: ne.lat(), lng: ne.lng() },
+                sw: { lat: sw.lat(), lng: sw.lng() },
+            });
+        };
+
+        // Attach listeners
+        map.addListener('idle', updateHeatmapTiles);
+        map.addListener('zoom_changed', updateHeatmapTiles);
+
+        return () => {
+            google.maps.event.clearListeners(map, 'idle');
+            google.maps.event.clearListeners(map, 'zoom_changed');
+        };
+    }, [map]);
+
+    return null;
+};
+
+export { Map, AdvancedMarker, Heatmap };

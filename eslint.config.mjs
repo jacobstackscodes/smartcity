@@ -12,6 +12,14 @@ const compat = new FlatCompat({
 const eslintConfig = [
     ...compat.extends('next/core-web-vitals', 'next/typescript'),
     {
+        files: ['./src/**/*.tsx', './src/**/*.ts'],
+        rules: {
+            indent: ['warn', 'tab'],
+            'max-len': ['error', { code: 100 }],
+            'nonblock-statement-body-position': ['error', 'besides'],
+        },
+    },
+    {
         files: ['./src/types/*.ts'],
         rules: {
             '@typescript-eslint/no-namespace': 'off',
