@@ -48,6 +48,9 @@ const Map: React.FC<{
 
             setMap(_map);
             setPosition(position); // ✅ Initialize position
+
+            const trafficLayer = new google.maps.TrafficLayer();
+            trafficLayer.setMap(_map);
         };
     }, [position, setMap, setPosition, mapRef]);
 

@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
                 longitude: body.location.lng,
             },
             universalAqi: false,
-            extraComputations: ['LOCAL_AQI'],
+            extraComputations: ['LOCAL_AQI', 'POLLUTANT_CONCENTRATION'],
             customLocalAqis: [{ regionCode: 'IN', aqi: 'usa_epa' }],
         };
 
