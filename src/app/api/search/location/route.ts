@@ -1,5 +1,6 @@
 import { GeocodingAPIResponse } from '@/types/google';
 import axios from 'axios';
+import { distance } from 'fastest-levenshtein';
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_KEY = process.env.NEXT_PUBLIC_MAPS_API_KEY;
@@ -52,10 +53,23 @@ export async function GET(request: NextRequest) {
         const result = data.results;
 
         // Check if it's an exact match and not a partial match
-        if (result.length > 1 || result[0].partial_match) {
+        const typoThreshold = 2; // Allow minor spelling mistakes (adjustable)
+        const originalQuery = search.toLowerCase().trim();
+        const isCloseMatch = result[0].address_components.some((component) => {
+            return (
+                distance(originalQuery, component.long_name.toLowerCase()) <=
+                    typoThreshold ||
+                distance(originalQuery, component.short_name.toLowerCase()) <=
+                    typoThreshold
+            );
+        });
+
+        // Only reject if it's a partial match *and* no close match is found
+        if (result.length > 1 || (result[0].partial_match && !isCloseMatch)) {
             return NextResponse.json(
                 {
                     error: 'Received partial match, please provide a more specific location',
+                    result,
                 },
                 { status: 400 },
             );

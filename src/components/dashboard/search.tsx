@@ -23,6 +23,7 @@ export const Search = ({ className, value: initialValue }: Props) => {
                 defaultValue={value}
                 placeholder="Search city..."
                 onChange={handleChange}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
             <button
                 className="absolute top-0 right-0 z-2 h-10 min-w-30 cursor-pointer rounded-md bg-emerald-600 px-4 text-white transition-[background] duration-300 hover:bg-emerald-700"
