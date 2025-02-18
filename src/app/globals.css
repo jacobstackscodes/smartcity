@@ -14,6 +14,14 @@
     --color-muted: oklch(92% 0.02 233.51);
     --color-border: #dee2e6;
     --color-input: oklch(80% 0.02 233.51);
+
+	--color-aqi-good: #87c13c;
+	--color-aqi-moderate: #efbe1d;
+	--color-aqi-sensitive: #f27e2f;
+	--color-aqi-unhealthy: #e84b50;
+	--color-aqi-very-unhealthy: #8a5d9d;
+	--color-aqi-hazardous: #915c6c;
+
 }
 
 @variant sm (@media screen and (min-width: theme(--breakpoint-sm)));
