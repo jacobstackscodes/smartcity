@@ -10,14 +10,11 @@ type Props = {
 };
 
 export const AQIMap = ({
-    center: _center = {
-        lat: 12.9716,
-        lng: 77.5946,
-    },
+    center,
 }: Props) => {
     return (
         <Map>
-            <AdvancedMarker position={_center} />
+            <AdvancedMarker position={center} />
         </Map>
     );
 };

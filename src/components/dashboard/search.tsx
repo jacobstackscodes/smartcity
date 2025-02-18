@@ -8,8 +8,6 @@ type Props = {
     className?: string;
 };
 
- // Assuming `cn` is for class merging
-
 export const Search = ({ className, value: initialValue }: Props) => {
     const { value, handleChange } = useDebouncedSearch(initialValue);
 
@@ -23,7 +21,7 @@ export const Search = ({ className, value: initialValue }: Props) => {
                 )}
                 type="text"
                 defaultValue={value}
-                placeholder="Search city or locality..."
+                placeholder="Search city..."
                 onChange={handleChange}
             />
         </div>

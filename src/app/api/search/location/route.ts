@@ -1,15 +1,115 @@
-import { NextRequest } from 'next/server';
+import { GeocodingAPIResponse } from '@/types/google';
+import axios from 'axios';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+const API_KEY = process.env.NEXT_PUBLIC_MAPS_API_KEY;
+
+export async function GET(request: NextRequest) {
     try {
-        const data = await request.json();
+        const search = request.nextUrl.searchParams.get('search');
 
-        if (!data.search)
-            return Response.json('Invalid search query', { status: 400 });
+        if (!search) {
+            return NextResponse.json(
+                { error: 'Search query parameter is required' },
+                { status: 400 },
+            );
+        }
+
+        if (!API_KEY) {
+            return NextResponse.json(
+                { error: 'Maps API key is missing from environment variables' },
+                { status: 500 },
+            );
+        }
+
+        // Construct Google Maps Geocoding API URL
+        const geocode_api = new URL(
+            'https://maps.googleapis.com/maps/api/geocode/json',
+        );
+        geocode_api.searchParams.append('key', API_KEY);
+        geocode_api.searchParams.append(
+            'address',
+            `${search}, Bangalore, Karnataka, India`,
+        );
+        geocode_api.searchParams.append('region', 'in');
+        geocode_api.searchParams.append(
+            'components',
+            'administrative_area_level_1:Karnataka|locality:Bangalore',
+        );
+
+        const response = await fetch(geocode_api.toString());
+        const data = (await response.json()) as GeocodingAPIResponse;
+
+        // Handle empty results
+        if (!data.results || data.results.length === 0) {
+            return NextResponse.json(
+                { error: 'No results found in Bangalore' },
+                { status: 400 },
+            );
+        }
+
+        // Extract first result
+        const result = data.results;
+
+        // Check if it's an exact match and not a partial match
+        if (result.length > 1 || result[0].partial_match) {
+            return NextResponse.json(
+                {
+                    error: 'Received partial match, please provide a more specific location',
+                },
+                { status: 400 },
+            );
+        }
+
+        // Validate result using `address_components`
+        const addressComponents = result[0].address_components;
+        let isBangalore = false;
+        let isKarnataka = false;
+
+        for (const component of addressComponents) {
+            if (
+                (component.types.includes('locality') ||
+                    component.types.includes('sublocality')) &&
+                component.long_name.includes('Bengaluru')
+            ) {
+                isBangalore = true;
+            }
+            if (
+                component.types.includes('administrative_area_level_1') &&
+                component.long_name === 'Karnataka'
+            ) {
+                isKarnataka = true;
+            }
+        }
+
+        if (!isBangalore || !isKarnataka) {
+            return NextResponse.json(
+                { error: 'Location is outside Bangalore, Karnataka' },
+                { status: 400 },
+            );
+        }
+
+        return NextResponse.json(
+            {
+                formatted_address: result[0].formatted_address,
+                location: result[0].geometry.location,
+            },
+            { status: 200 },
+        );
     } catch (error) {
-        if (error instanceof Error)
-            return Response.json(error.message, { status: 400 });
+        if (axios.isAxiosError(error)) {
+            return NextResponse.json(
+                {
+                    error:
+                        error.response?.data || 'Error fetching geocode data',
+                },
+                { status: error.response?.status || 500 },
+            );
+        }
 
-        return Response.json('Something went wrong', { status: 500 });
+        return NextResponse.json(
+            { error: 'Something went wrong' },
+            { status: 500 },
+        );
     }
 }

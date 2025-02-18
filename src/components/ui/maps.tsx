@@ -70,26 +70,26 @@ const Map: React.FC<{
 };
 
 const AdvancedMarker: React.FC<{
-    position: { lat: number; lng: number };
+	position?: { lat: number; lng: number } | null;
 }> = ({ position }) => {
-    const { map } = useMapStore();
+	const { map } = useMapStore();
 
-    useEffect(() => {
-        const initializeMarker = async () => {
-            if (!map) return;
-            const { AdvancedMarkerElement } =
-                await loader.importLibrary('marker');
-            new AdvancedMarkerElement({
-                position: position ?? { lat: 12.9716, lng: 77.5946 },
-                map: map,
-                title: 'Bangalore',
-            });
-        };
+	useEffect(() => {
+		if (!map || !position) return;
 
-        initializeMarker();
-    }, [map, position]);
+		const initializeMarker = async () => {
+			const { AdvancedMarkerElement } = await loader.importLibrary('marker');
+			new AdvancedMarkerElement({
+				position,
+				map,
+				title: 'Bangalore',
+			});
+		};
 
-    return null;
+		initializeMarker();
+	}, [map, position]);
+
+	return null;
 };
 
 const Heatmap: React.FC = () => {

@@ -1,16 +1,23 @@
+import { AQIData } from '@/components/dashboard/aqi-data';
 import { AQIMap } from '@/components/dashboard/aqi-map';
 import { Search } from '@/components/dashboard/search';
 import { Card } from '@/components/ui/card';
+import { fetchAqi, fetchLocation } from '@/lib/requests';
 
 export default async function Page({ searchParams }: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-    const city = (await searchParams).city as string;
+    const city = (await searchParams).city as string ?? "Bangalore";
+
+	const location = await fetchLocation(city);
+	const aqi = await fetchAqi(location?.location);
+	
+	const aqi_data = aqi.indexes[0];
     
     return (
         <>
             <div className="absolute top-0 left-0 z-0 h-dvh w-dvw bg-gradient-to-r from-gray-500 to-gray-400">
-                <AQIMap />
+                <AQIMap center={location?.location} />
             </div>
             <Card className="absolute inset-x-0 bottom-16 z-5 mx-auto max-w-2xl flex flex-col gap-1 rounded-xl shadow-lg shadow-black">
 
@@ -19,12 +26,7 @@ export default async function Page({ searchParams }: {
                 </div>
                 <div className='w-full h-px bg-input' />
                 <div className='grid grid-cols-4 p-1'>
-                    <div className="col-span-1 bg-emerald-500 p-4 rounded-lg">
-                        <div className='flex flex-col gap-2 items-center text-white'>
-                            <span className='text-xl/none font-semibold'>120</span>
-                            <span className='text-sm/none'>AQI&apos; US</span>
-                        </div>
-                    </div>
+                    <AQIData data={aqi_data} />
                     <div className="col-span-1"></div>
                     <div className="col-span-1"></div>
                     <div className="col-span-1"></div>
