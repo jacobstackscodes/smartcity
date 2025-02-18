@@ -9,12 +9,10 @@ type Props = {
     };
 };
 
-export const AQIMap = ({
-    center,
-}: Props) => {
+export const AQIMap = ({ center }: Props) => {
     return (
-        <Map>
-            <AdvancedMarker position={center} />
+        <Map position={center!}>
+            <AdvancedMarker />
         </Map>
     );
 };

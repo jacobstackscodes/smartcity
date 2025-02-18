@@ -6,14 +6,16 @@ import { create } from 'zustand';
 
 interface MapStore {
     map: google.maps.Map | null;
-    mapRef: React.RefObject<HTMLDivElement | null>;
     setMap: (map: google.maps.Map) => void;
+    position: { lat: number; lng: number } | null;
+    setPosition: (position: { lat: number; lng: number }) => void;
 }
 
 const useMapStore = create<MapStore>((set) => ({
     map: null,
-    mapRef: { current: null },
     setMap: (map) => set({ map }),
+    position: null,
+    setPosition: (position) => set({ position }),
 }));
 
 const loader = new Loader({
@@ -22,23 +24,19 @@ const loader = new Loader({
 });
 
 const Map: React.FC<{
+    position: { lat: number; lng: number };
     children?: React.ReactNode;
-}> = (props) => {
-    const { setMap, mapRef } = useMapStore();
-    const localMapRef = useRef<HTMLDivElement>(null);
+}> = ({ position, children }) => {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const { map, setMap, setPosition } = useMapStore();
 
-    useEffect(() => {
-        if (!mapRef.current) {
-            mapRef.current = localMapRef.current;
-        }
-    }, [mapRef]);
-
+    // ✅ Stable function reference with `useMemo()`
     const initializeMap = useMemo(() => {
         return async () => {
             if (!mapRef.current) return;
             const { Map, RenderingType } = await loader.importLibrary('maps');
             const _map = new Map(mapRef.current, {
-                center: { lat: 12.9716, lng: 77.5946 },
+                center: position,
                 zoom: 14,
                 mapTypeControl: false,
                 streetViewControl: false,
@@ -49,47 +47,48 @@ const Map: React.FC<{
             });
 
             setMap(_map);
+            setPosition(position); // ✅ Initialize position
         };
-    }, [setMap, mapRef]);
+    }, [position, setMap, setPosition, mapRef]);
 
     useEffect(() => {
-        initializeMap();
+        if (!map) {
+            initializeMap();
+        }
+    }, [map, initializeMap]);
 
-        return () => {
-            mapRef.current = null; // Reset on unmount
-        };
-    }, [initializeMap, mapRef]);
+    useEffect(() => {
+        if (map && position) {
+            map.panTo(position);
+            setPosition(position);
+        }
+    }, [map, position, setPosition]);
 
     return (
-        <div
-            ref={localMapRef}
-            style={{ height: '100%', width: '100%' }}
-            {...props}
-        />
+        <div ref={mapRef} style={{ height: '100%', width: '100%' }}>
+            {children}
+        </div>
     );
 };
 
-const AdvancedMarker: React.FC<{
-	position?: { lat: number; lng: number } | null;
-}> = ({ position }) => {
-	const { map } = useMapStore();
+const AdvancedMarker: React.FC = () => {
+    const { map, position } = useMapStore();
+    const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(
+        null,
+    );
 
-	useEffect(() => {
-		if (!map || !position) return;
+    useEffect(() => {
+        if (!map || !position) return;
 
-		const initializeMarker = async () => {
-			const { AdvancedMarkerElement } = await loader.importLibrary('marker');
-			new AdvancedMarkerElement({
-				position,
-				map,
-				title: 'Bangalore',
-			});
-		};
+        loader.importLibrary('marker').then(({ AdvancedMarkerElement }) => {
+            if (!markerRef.current) {
+                markerRef.current = new AdvancedMarkerElement({ map });
+            }
+            markerRef.current.position = position;
+        });
+    }, [map, position]);
 
-		initializeMarker();
-	}, [map, position]);
-
-	return null;
+    return null;
 };
 
 const Heatmap: React.FC = () => {
