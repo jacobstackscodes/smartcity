@@ -16,7 +16,7 @@ export default async function Page({
     const aqi = await fetchAqi(location?.location);
 
     return (
-        <main className="relative size-full min-h-dvh pt-[80dvh]">
+        <main className="relative size-full min-h-dvh pt-[calc(100dvh-9.875rem)]">
             <div className="fixed top-0 left-0 z-0 h-dvh w-dvw bg-gradient-to-r from-gray-500 to-gray-400">
                 <AQIMap center={location?.location} />
             </div>
