@@ -1,37 +1,85 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { Index } from '@/types/google-aqi';
 
 type Props = {
-	data: {
-		displayName: string;
-		aqi: number;
-		color: {
-			red: number;
-			green: number;
-			blue: number;
-		}
-	}
-}
+    className?: string;
+    data: Pick<Index, 'aqi' | 'displayName'> | undefined;
+};
 
-export const AQIData = ({ data }: Props) => {
-	const { displayName, aqi } = data;
+export const AQIData = ({ className, data }: Props) => {
+    const { displayName, aqi } = data || { displayName: 'N/A', aqi: 0 };
 
-	return (
-		<div className={cn(
-			"col-span-1 p-4 rounded-lg text-black/90 ring-inset ring-black/20 transition-[box-shadow] duration-300 hover:ring-4", 
-			{
-				'bg-aqi-good': aqi <= 50,
-				'bg-aqi-moderate': aqi > 50 && aqi <= 100,
-				'bg-aqi-sensitive': aqi > 100 && aqi <= 150,
-				'bg-aqi-unhealthy': aqi > 150 && aqi <= 200,
-				'bg-aqi-very-unhealthy': aqi > 200 && aqi <= 300,
-				'bg-aqi-hazardous': aqi > 300,
-				'text-white/90': aqi > 200
-			}
-		)}>
-			<div className='flex flex-col gap-2 items-center'>
-				<span className='text-xl/none font-semibold'>{aqi}</span>
-				<span className='text-sm/none'>{displayName}</span>
-			</div>
-		</div>
-	)
-}
+    const categories = [
+        {
+            limit: 50,
+            name: 'good',
+            text: 'Good',
+            bg: 'bg-good',
+            muted: 'bg-good-muted',
+        },
+        {
+            limit: 100,
+            name: 'moderate',
+            text: 'Moderate',
+            bg: 'bg-moderate',
+            muted: 'bg-moderate-muted',
+        },
+        {
+            limit: 150,
+            name: 'sensitive',
+            text: 'Unhealthy for sensitive groups',
+            bg: 'bg-sensitive',
+            muted: 'bg-sensitive-muted',
+        },
+        {
+            limit: 200,
+            name: 'unhealthy',
+            text: 'Unhealthy',
+            bg: 'bg-unhealthy',
+            muted: 'bg-unhealthy-muted',
+            textColor: 'text-white',
+        },
+        {
+            limit: 300,
+            name: 'veryUnhealthy',
+            text: 'Very Unhealthy',
+            bg: 'bg-very-unhealthy',
+            muted: 'bg-very-unhealthy-muted',
+            textColor: 'text-white',
+        },
+        {
+            limit: 500,
+            name: 'hazardous',
+            text: 'Hazardous',
+            bg: 'bg-hazardous',
+            muted: 'bg-hazardous-muted',
+            textColor: 'text-white',
+        },
+    ];
+
+    const { bg, muted, text, textColor } = categories.find(
+        ({ limit }) => aqi <= limit,
+    )!;
+
+    return (
+        <div
+            className={cn(
+                'flex items-center gap-4 rounded-lg p-2 text-black',
+                muted,
+                textColor,
+                className,
+            )}
+        >
+            <div
+                className={cn(
+                    'flex w-26 shrink-0 flex-col items-center gap-1 rounded-md px-2 py-3',
+                    bg,
+                )}
+            >
+                <span className="text-xl/none">{aqi}</span>
+                <span className="text-sm/none font-light">{displayName}</span>
+            </div>
+            <div className="grow text-base/none font-light">{text}</div>
+        </div>
+    );
+};

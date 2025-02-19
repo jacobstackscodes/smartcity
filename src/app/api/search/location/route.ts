@@ -1,4 +1,4 @@
-import { GeocodingAPIResponse } from '@/types/google';
+import { GeocodingAPIResponse } from '@/types/google-location';
 import axios from 'axios';
 import { distance } from 'fastest-levenshtein';
 import { NextRequest, NextResponse } from 'next/server';

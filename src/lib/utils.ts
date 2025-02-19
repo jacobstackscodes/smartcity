@@ -8,4 +8,15 @@ const genAi = new GoogleGenerativeAI(
     process.env.GOOGLE_GEMINI_API_KEY as string,
 ).getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-export { cn, genAi };
+const pollutionUnits = (unit: string) => {
+    switch (unit) {
+        case 'PARTS_PER_BILLION':
+            return 'ppb';
+        case 'MICROGRAMS_PER_CUBIC_METER':
+            return 'µg/m³';
+        default:
+            return '';
+    }
+};
+
+export { cn, genAi, pollutionUnits };

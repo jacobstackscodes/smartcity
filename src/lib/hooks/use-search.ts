@@ -1,12 +1,12 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState, useCallback, useMemo } from 'react';
 
-export const useSearch = (initialValue?: string | null) => {
+export const useSearch = (key: string = 'search') => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const [value, setValue] = useState(initialValue ?? '');
+    const [value, setValue] = useState('');
 
     const createQueryString = useMemo(
         () => (name: string, value: string) => {
@@ -25,10 +25,12 @@ export const useSearch = (initialValue?: string | null) => {
         (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value),
         [],
     );
-    const handleSearch = useCallback(
-        () => router.push(`${pathname}?${createQueryString('city', value)}`),
-        [router, pathname, createQueryString, value],
-    );
+    const handleSearch = useCallback(() => {
+        router.push(`${pathname}?${createQueryString(key, value)}`, {
+            scroll: false,
+        });
+        setValue('');
+    }, [router, pathname, createQueryString, value, key]);
 
     return {
         value,

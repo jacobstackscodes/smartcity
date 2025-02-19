@@ -1,5 +1,6 @@
-import { AQIData } from '@/components/dashboard/aqi-data';
 import { AQIMap } from '@/components/dashboard/aqi-map';
+import { AQIPollutants } from '@/components/dashboard/aqi-pollutants';
+import { Header } from '@/components/dashboard/header';
 import { Search } from '@/components/dashboard/search';
 import { Card } from '@/components/ui/card';
 import { fetchAqi, fetchLocation } from '@/lib/requests';
@@ -9,31 +10,24 @@ export default async function Page({
 }: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const city = ((await searchParams).city as string) ?? 'Bangalore';
+    const search = ((await searchParams).search as string) ?? 'Bangalore';
 
-    const location = await fetchLocation(city);
-    console.log(location);
+    const location = await fetchLocation(search);
     const aqi = await fetchAqi(location?.location);
 
-    const aqi_data = aqi.indexes[0];
-
     return (
-        <>
-            <div className="absolute top-0 left-0 z-0 h-dvh w-dvw bg-gradient-to-r from-gray-500 to-gray-400">
+        <main className="relative size-full min-h-dvh pt-[80dvh]">
+            <div className="fixed top-0 left-0 z-0 h-dvh w-dvw bg-gradient-to-r from-gray-500 to-gray-400">
                 <AQIMap center={location?.location} />
             </div>
-            <Card className="absolute inset-x-0 bottom-16 z-5 mx-auto flex max-w-2xl flex-col gap-1 rounded-xl shadow-lg shadow-black">
-                <div className="p-1">
-                    <Search value={city ?? 'Bangalore'} />
-                </div>
-                <div className="h-px w-full bg-input" />
-                <div className="grid grid-cols-4 p-1">
-                    <AQIData data={aqi_data} />
-                    <div className="col-span-1"></div>
-                    <div className="col-span-1"></div>
-                    <div className="col-span-1"></div>
-                </div>
+            <Card className="wrapper relative z-5 min-h-[20dvh] rounded-t-xl rounded-b-none !px-0 shadow-lg shadow-black">
+                <Header
+                    address={location?.formatted_address}
+                    data={aqi?.indexes[0]}
+                />
+                <Search />
+                <AQIPollutants data={aqi?.pollutants} />
             </Card>
-        </>
+        </main>
     );
 }

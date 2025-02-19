@@ -1,4 +1,5 @@
-import type { LocationResponse, LatLng } from '@/types/google';
+import type { LocationResponse, LatLng } from '@/types/google-location';
+import type { AqiResponse } from '@/types/google-aqi';
 import axios from 'axios';
 
 const req = axios.create({
@@ -22,5 +23,5 @@ export const fetchAqi = async (location?: LatLng | null) => {
         location,
     });
 
-    return data;
+    return data as AqiResponse;
 };

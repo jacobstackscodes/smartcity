@@ -9,19 +9,26 @@
     --breakpoint-xl: 1200px;
     --breakpoint-xxl: 1400px;
 
-    --color-primary: #007bff;
     --color-foreground: oklch(7.97% 0.0166 233.51);
+    --color-primary: #007bff;
+    --color-card: #f4f5f6;
     --color-muted: oklch(92% 0.02 233.51);
-    --color-border: #dee2e6;
+
+    --color-border: #bfc7cf;
     --color-input: oklch(80% 0.02 233.51);
 
-	--color-aqi-good: #87c13c;
-	--color-aqi-moderate: #efbe1d;
-	--color-aqi-sensitive: #f27e2f;
-	--color-aqi-unhealthy: #e84b50;
-	--color-aqi-very-unhealthy: #8a5d9d;
-	--color-aqi-hazardous: #915c6c;
-
+    --color-good: #87c13c;
+    --color-good-muted: #a8e05f;
+    --color-moderate: #efbe1d;
+    --color-moderate-muted: #f4d56e;
+    --color-sensitive: #f27e2f;
+    --color-sensitive-muted: #ffa569;
+    --color-unhealthy: #e84b50;
+    --color-unhealthy-muted: #ff7e7d;
+    --color-very-unhealthy: #8a5d9d;
+    --color-very-unhealthy-muted: #a37abf;
+    --color-hazardous: #915c6c;
+    --color-hazardous-muted: #b07a8a;
 }
 
 @variant sm (@media screen and (min-width: theme(--breakpoint-sm)));
@@ -62,6 +69,60 @@
     background: linear-gradient(
         to top,
         oklch(0.623 0.214 259.815 / 20%) 0%,
+        transparent 40%,
+        transparent 100%
+    );
+}
+
+@utility bg-gradient-good {
+    background: linear-gradient(
+        to top,
+        color-mix(in oklch, var(--color-good) 40%, transparent) 0%,
+        transparent 40%,
+        transparent 100%
+    );
+}
+
+@utility bg-gradient-moderate {
+    background: linear-gradient(
+        to top,
+        color-mix(in oklch, var(--color-moderate) 40%, transparent) 0%,
+        transparent 40%,
+        transparent 100%
+    );
+}
+
+@utility bg-gradient-sensitive {
+    background: linear-gradient(
+        to top,
+        color-mix(in oklch, var(--color-sensitive) 40%, transparent) 0%,
+        transparent 40%,
+        transparent 100%
+    );
+}
+
+@utility bg-gradient-unhealthy {
+    background: linear-gradient(
+        to top,
+        color-mix(in oklch, var(--color-unhealthy) 40%, transparent) 0%,
+        transparent 40%,
+        transparent 100%
+    );
+}
+
+@utility bg-gradient-very-unhealthy {
+    background: linear-gradient(
+        to top,
+        color-mix(in oklch, var(--color-very-unhealthy) 40%, transparent) 0%,
+        transparent 40%,
+        transparent 100%
+    );
+}
+
+@utility bg-gradient-hazardous {
+    background: linear-gradient(
+        to top,
+        color-mix(in oklch, var(--color-hazardous) 40%, transparent) 0%,
         transparent 40%,
         transparent 100%
     );
