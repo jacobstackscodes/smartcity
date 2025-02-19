@@ -20,10 +20,14 @@ const eslintConfig = [
         },
     },
     {
-        files: ['./src/types/*.ts'],
-        rules: {
-            '@typescript-eslint/no-namespace': 'off',
-        },
+        overrides: [
+            {
+                files: ['./src/types/*.ts'],
+                rules: {
+                    '@typescript-eslint/no-namespace': 'off',
+                },
+            },
+        ],
     },
 ];
 
