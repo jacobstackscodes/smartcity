@@ -6,7 +6,7 @@ type Props = {
     data: Pick<Index, 'aqi' | 'displayName'> | undefined;
 };
 
-export const AQIData = ({ className, data }: Props) => {
+export const Status = ({ className, data }: Props) => {
     const { displayName, aqi } = data || { displayName: 'N/A', aqi: 0 };
 
     const categories = [

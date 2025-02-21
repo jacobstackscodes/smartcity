@@ -1,13 +1,14 @@
-import { AQIData } from './aqi-data';
+import { Status } from './status';
 import { cn } from '@/lib/utils';
 import { Index } from '@/types/google-aqi';
+import { memo } from 'react';
 
 type Props = {
     address: string | undefined;
     data: Index | undefined;
 };
 
-export const Header = ({ address, data }: Props) => {
+export const AQIHeader = memo(({ address, data }: Props) => {
     const gradientClass = data?.aqi
         ? cn({
               'bg-gradient-good': data.aqi <= 50,
@@ -20,13 +21,18 @@ export const Header = ({ address, data }: Props) => {
         : '';
 
     return (
-        <div className={cn('flex flex-col gap-2 px-20 py-4', gradientClass)}>
+        <section
+            className={cn(
+                'flex flex-col gap-2 px-20 py-4 transition-[background] duration-1000',
+                gradientClass,
+            )}
+        >
             <h2 className="mb-2 text-2xl font-semibold text-black">
                 {address}
             </h2>
             <div className="grid grid-cols-12 gap-2">
-                <AQIData className="col-span-3" data={data} />
+                <Status className="col-span-3" data={data} />
             </div>
-        </div>
+        </section>
     );
-};
+});

@@ -6,7 +6,7 @@ export const Search = () => {
     const { value, handleChange, handleSearch } = useSearch();
 
     return (
-        <div className="flex items-center gap-2 border-y border-border px-20 py-2">
+        <section className="flex items-center gap-2 border-y border-border px-20 py-2">
             <input
                 type="text"
                 className="h-10 grow outline-none"
@@ -23,6 +23,6 @@ export const Search = () => {
                 <i className="ri-search-line"></i>
                 Search
             </button>
-        </div>
+        </section>
     );
 };

@@ -19,7 +19,7 @@ export const fetchLocation = async (search: string | null) => {
 export const fetchAqi = async (location?: LatLng | null) => {
     if (!location) return null;
 
-    const { data } = await req.post('/api/search/aqi', {
+    const { data } = await req.post('/api/search/aqi/current', {
         location,
     });
 

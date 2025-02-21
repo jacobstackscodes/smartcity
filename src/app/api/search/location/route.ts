@@ -75,34 +75,6 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Validate result using `address_components`
-        const addressComponents = result[0].address_components;
-        let isBangalore = false;
-        let isKarnataka = false;
-
-        for (const component of addressComponents) {
-            if (
-                (component.types.includes('locality') ||
-                    component.types.includes('sublocality')) &&
-                component.long_name.includes('Bengaluru')
-            ) {
-                isBangalore = true;
-            }
-            if (
-                component.types.includes('administrative_area_level_1') &&
-                component.long_name === 'Karnataka'
-            ) {
-                isKarnataka = true;
-            }
-        }
-
-        if (!isBangalore || !isKarnataka) {
-            return NextResponse.json(
-                { error: 'Location is outside Bangalore, Karnataka' },
-                { status: 400 },
-            );
-        }
-
         return NextResponse.json(
             {
                 formatted_address: result[0].formatted_address,

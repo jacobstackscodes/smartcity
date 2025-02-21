@@ -17,7 +17,7 @@ export const AQIPollutants = ({ data }: Props) => {
             })) || [];
 
     return (
-        <div className="px-20 py-8">
+        <div className="px-20">
             <h4 className="mb-4 text-lg font-semibold text-black">
                 Pollutants
             </h4>
