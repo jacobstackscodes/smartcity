@@ -23,23 +23,18 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Construct Google Maps Geocoding API URL
-        const geocode_api = new URL(
+        const { data } = await axios.get<GeocodingAPIResponse>(
             'https://maps.googleapis.com/maps/api/geocode/json',
+            {
+                params: {
+                    key: API_KEY,
+                    address: `${search}, Bangalore, Karnataka, India`,
+                    region: 'in',
+                    components:
+                        'administrative_area_level_1:Karnataka|locality:Bangalore',
+                },
+            },
         );
-        geocode_api.searchParams.append('key', API_KEY);
-        geocode_api.searchParams.append(
-            'address',
-            `${search}, Bangalore, Karnataka, India`,
-        );
-        geocode_api.searchParams.append('region', 'in');
-        geocode_api.searchParams.append(
-            'components',
-            'administrative_area_level_1:Karnataka|locality:Bangalore',
-        );
-
-        const response = await fetch(geocode_api.toString());
-        const data = (await response.json()) as GeocodingAPIResponse;
 
         // Handle empty results
         if (!data.results || data.results.length === 0) {

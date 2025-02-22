@@ -2,6 +2,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import clsx, { type ClassArray } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { AqiState } from '@/types/google-aqi';
+import { ZodError } from 'zod';
+import { createMessageBuilder, fromError } from 'zod-validation-error';
+import { AxiosError } from 'axios';
 
 const cn = (...classes: ClassArray) => twMerge(clsx(classes));
 
@@ -30,4 +33,36 @@ const aqiStatus = (aqi: number): AqiState => {
     else throw new Error('Invalid AQI value');
 };
 
-export { cn, genAi, pollutionUnits, aqiStatus };
+const formatAxiosError = (error: AxiosError) => {
+    return {
+        error: 'External API Error',
+        message: error.response?.data || error.message,
+    };
+};
+
+const formatZodError = (error: ZodError) => {
+    const messageBuilder = createMessageBuilder({
+        issueSeparator: ', ',
+        unionSeparator: ' or ',
+        prefix: null,
+        prefixSeparator: ' ',
+        includePath: false,
+        maxIssuesInMessage: 3,
+    });
+
+    return {
+        error: 'Validation Error',
+        message: fromError(error, {
+            messageBuilder,
+        }).toString(),
+    };
+};
+
+export {
+    cn,
+    genAi,
+    pollutionUnits,
+    aqiStatus,
+    formatZodError,
+    formatAxiosError,
+};
