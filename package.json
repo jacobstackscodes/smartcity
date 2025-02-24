@@ -12,6 +12,7 @@
 		"@googlemaps/js-api-loader": "^1.16.8",
 		"axios": "^1.7.9",
 		"clsx": "^2.1.1",
+		"date-fns": "^4.1.0",
 		"fastest-levenshtein": "^1.0.16",
 		"mongoose": "^8.10.1",
 		"next": "15.1.7",
@@ -20,6 +21,7 @@
 		"recharts": "^2.15.1",
 		"remixicon": "^4.6.0",
 		"tailwind-merge": "^3.0.1",
+		"url-template": "^3.1.1",
 		"zod": "^3.24.2",
 		"zod-validation-error": "^3.4.0",
 		"zustand": "^5.0.3"
