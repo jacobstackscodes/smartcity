@@ -7,8 +7,8 @@ import { create } from 'zustand';
 interface MapStore {
     map: google.maps.Map | null;
     setMap: (map: google.maps.Map) => void;
-    position: { lat: number; lng: number } | null;
-    setPosition: (position: { lat: number; lng: number }) => void;
+    position: { latitude: number; longitude: number } | null;
+    setPosition: (position: { latitude: number; longitude: number }) => void;
 }
 
 const useMapStore = create<MapStore>((set) => ({
@@ -24,7 +24,7 @@ const loader = new Loader({
 });
 
 const Map: React.FC<{
-    position: { lat: number; lng: number };
+    position: { latitude: number; longitude: number };
     children?: React.ReactNode;
 }> = ({ position, children }) => {
     const mapRef = useRef<HTMLDivElement>(null);
@@ -36,7 +36,10 @@ const Map: React.FC<{
             if (!mapRef.current) return;
             const { Map, RenderingType } = await loader.importLibrary('maps');
             const _map = new Map(mapRef.current, {
-                center: position,
+                center: {
+                    lat: position.latitude,
+                    lng: position.longitude,
+                },
                 zoom: 14,
                 mapTypeControl: false,
                 streetViewControl: false,
@@ -62,7 +65,7 @@ const Map: React.FC<{
 
     useEffect(() => {
         if (map && position) {
-            map.panTo(position);
+            map.panTo({ lat: position.latitude, lng: position.longitude });
             setPosition(position);
         }
     }, [map, position, setPosition]);
@@ -87,7 +90,10 @@ const AdvancedMarker: React.FC = () => {
             if (!markerRef.current) {
                 markerRef.current = new AdvancedMarkerElement({ map });
             }
-            markerRef.current.position = position;
+            markerRef.current.position = new google.maps.LatLng(
+                position.latitude,
+                position.longitude,
+            );
         });
     }, [map, position]);
 

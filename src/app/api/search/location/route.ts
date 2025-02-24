@@ -73,7 +73,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(
             {
                 formatted_address: result[0].formatted_address,
-                location: result[0].geometry.location,
+                location: {
+                    latitude: result[0].geometry.location.lat,
+                    longitude: result[0].geometry.location.lng,
+                },
             },
             { status: 200 },
         );

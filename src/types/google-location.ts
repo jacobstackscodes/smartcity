@@ -67,7 +67,10 @@ type GeocodingAPIResponse = {
 
 type LocationResponse = {
     formatted_address: string;
-    location: LatLng;
+    location: {
+        latitude: number;
+        longitude: number;
+    };
 };
 
 export type { LatLng, GeocodingAPIResponse, LocationResponse };

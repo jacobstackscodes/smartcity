@@ -3,8 +3,10 @@ import { AQIMap } from '@/components/dashboard/aqi-map';
 import { AQIPollutants } from '@/components/dashboard/aqi-pollutants';
 import { AQIHeader } from '@/components/dashboard/aqi-header';
 import { Search } from '@/components/dashboard/search';
-import { fetchAqi, fetchLocation } from '@/lib/requests';
+import { fetchAqi, fetchForecast, fetchLocation } from '@/lib/requests';
 import { AQIForecast } from '@/components/dashboard/aqi-forecast';
+import { retrieveInterval } from '@/lib/utils';
+import { notFound } from 'next/navigation';
 
 export default async function Page({
     searchParams,
@@ -12,9 +14,19 @@ export default async function Page({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
     const search = ((await searchParams).search as string) ?? 'Bangalore';
-
     const location = await fetchLocation(search);
-    const aqi = await fetchAqi(location?.location);
+
+    if (!location) {
+        notFound();
+    }
+
+    const current = await fetchAqi({ location: location.location });
+    const forecast = await fetchForecast({
+        location: location.location,
+        period: retrieveInterval(),
+    });
+
+    console.log(forecast?.hourlyForecasts);
 
     return (
         <main className="relative size-full min-h-dvh pt-[calc(100dvh-9.875rem)]">
@@ -24,13 +36,13 @@ export default async function Page({
             <article className="wrapper relative z-5 min-h-[20dvh] rounded-t-xl rounded-b-none bg-white !px-0 shadow-lg shadow-black">
                 <AQIHeader
                     address={location?.formatted_address}
-                    data={aqi?.indexes[0]}
+                    data={current?.indexes[0]}
                 />
                 <Search />
                 <section className="space-y-8 py-8">
                     <AQIForecast />
-                    <AQIPollutants data={aqi?.pollutants} />
-                    <AQIAdvisory data={aqi?.healthRecommendations} />
+                    <AQIPollutants data={current?.pollutants} />
+                    <AQIAdvisory data={current?.healthRecommendations} />
                 </section>
             </article>
         </main>

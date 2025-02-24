@@ -25,9 +25,7 @@ export async function GET(request: NextRequest) {
         );
         if (missingParams.length > 0) {
             return NextResponse.json(
-                {
-                    error: `Missing parameters: ${missingParams.join(', ')}`,
-                },
+                { error: `Missing parameters: ${missingParams.join(', ')}` },
                 { status: 400 },
             );
         }

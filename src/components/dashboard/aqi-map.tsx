@@ -4,8 +4,8 @@ import { AdvancedMarker, Map } from '../ui/maps';
 
 type Props = {
     center?: {
-        lat: number;
-        lng: number;
+        latitude: number;
+        longitude: number;
     };
 };
 

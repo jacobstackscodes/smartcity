@@ -1,7 +1,7 @@
-import type { LocationResponse, LatLng } from '@/types/google-location';
-import type { AqiResponse } from '@/types/google-aqi';
 import axios from 'axios';
 import { CurrentProps, ForecastProps } from './validators/request';
+import type { LocationResponse } from '@/types/google-location';
+import type { AqiResponse } from '@/types/google-aqi';
 
 const req = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BASE_URL,
