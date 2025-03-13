@@ -38,20 +38,20 @@ export async function POST(request: NextRequest) {
             return NextResponse.json('No data found', { status: 404 });
         }
 
-        const response = {
-            hourlyForecasts: data.hourlyForecasts.map((item) => {
-                const { date, time } = formatDatetime(item.dateTime);
-                return {
-                    date,
-                    time,
-                    aqi: item.indexes[0].aqi,
-                };
-            }),
-            regionCode: data.regionCode,
-            nextPageToken: data.nextPageToken,
-        };
+        // const response = {
+        //     hourlyForecasts: data.hourlyForecasts.map((item) => {
+        //         const { date, time } = formatDatetime(item.dateTime);
+        //         return {
+        //             date,
+        //             time,
+        //             aqi: item.indexes[0].aqi,
+        //         };
+        //     }),
+        //     regionCode: data.regionCode,
+        //     nextPageToken: data.nextPageToken,
+        // };
 
-        return NextResponse.json(response, { status: 200 });
+        return NextResponse.json(data, { status: 200 });
     } catch (error) {
         return errorHandler(error);
     }

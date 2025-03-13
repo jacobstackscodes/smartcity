@@ -2,8 +2,6 @@
 
 import { useDragScroll } from '@/lib/hooks/use-drag-scroll';
 import { aqiStatus, cn } from '@/lib/utils';
-import { createRef } from 'react';
-import ForecastChart from '../charts/forecast-chart';
 
 type ItemProps = {
     aqi: number;
@@ -44,8 +42,8 @@ export const AQIForecast = () => {
             <h4 className="mb-4 text-lg font-semibold text-black">
                 Hourly Forecast
             </h4>
-            {/* <div
-                className="flex scrollbar-none cursor-grab flex-nowrap gap-2 overflow-x-auto active:cursor-grabbing"
+            <div
+                className="scrollbar-none flex cursor-grab flex-nowrap gap-2 overflow-x-auto active:cursor-grabbing"
                 ref={dragscrollRef}
             >
                 <div className="flex flex-col items-start justify-center gap-2">
@@ -111,8 +109,7 @@ export const AQIForecast = () => {
                         <ForecastItem aqi={410} time="24:00" />
                     </div>
                 </div>
-            </div> */}
-            <ForecastChart />
+            </div>
         </section>
     );
 };
