@@ -62,8 +62,13 @@ const retrieveInterval = (days = 1) => {
     const now = new Date();
 
     // Move to the next full hour
-    const nextHour = addHours(now, 1);
+    let nextHour = addHours(now, 1);
     nextHour.setMinutes(0, 0, 0);
+
+    // If the current time is less than 1 minute to the next hour, add another hour
+    if (now.getMinutes() === 59) {
+        nextHour = addHours(nextHour, 1);
+    }
 
     // Helper function to format the date as local timestamp
     const formatLocalTime = (date: Date) =>

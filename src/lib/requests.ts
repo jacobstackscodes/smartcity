@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { CurrentProps, ForecastProps } from './validators/request';
 import type { LocationResponse } from '@/types/google-location';
 import type { AqiResponse } from '@/types/google-aqi';
@@ -32,6 +32,20 @@ export const fetchForecast = async (
 ): Promise<ForecastResponse | null> => {
     if (!values || !values.location || !values.period) return null;
 
-    const { data } = await req.post('/api/search/aqi/forecast', values);
-    return data;
+    try {
+        const { data } = await req.post('/api/search/aqi/forecast', values);
+        return data;
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            console.error(error.response?.data.message.error.message);
+            return null;
+        }
+
+        if (error instanceof Error) {
+            console.error(error.message);
+            return null;
+        }
+
+        return null;
+    }
 };
