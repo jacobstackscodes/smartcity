@@ -17,8 +17,13 @@ type Forecast = {
     indexes: Index[];
 };
 
-type ForecastResponse = {
+type ForecastAPIResponse = {
     hourlyForecasts: Forecast[];
     regionCode: string;
     nextPageToken: string;
 };
+
+type ForecastResponse = {
+    date: string;
+    data: { time: string; aqi: number }[];
+}[];

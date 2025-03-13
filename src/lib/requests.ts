@@ -37,7 +37,10 @@ export const fetchForecast = async (
         return data;
     } catch (error) {
         if (error instanceof AxiosError) {
-            console.error(error.response?.data.message.error.message);
+            console.error({
+                period: values.period,
+                message: error.response?.data.message,
+            });
             return null;
         }
 

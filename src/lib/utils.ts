@@ -1,9 +1,11 @@
+import { AxiosError } from 'axios';
+import clsx, { type ClassArray } from 'clsx';
+import { addHours, addDays, setMinutes } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
+import { twMerge } from 'tailwind-merge';
 import { ZodError } from 'zod';
 import { createMessageBuilder, fromError } from 'zod-validation-error';
-import clsx, { type ClassArray } from 'clsx';
-import { AxiosError } from 'axios';
-import { twMerge } from 'tailwind-merge';
-import { addMinutes, addHours, addDays, format } from 'date-fns';
+
 import type { AqiState } from '@/types/google-aqi';
 
 const cn = (...classes: ClassArray) => twMerge(clsx(classes));
@@ -32,7 +34,8 @@ const aqiStatus = (aqi: number): AqiState => {
 const formatAxiosError = (error: AxiosError) => {
     return {
         error: 'External API Error',
-        message: error.response?.data || error.message,
+        message: (error.response?.data as { error: { message: string } }).error
+            .message,
     };
 };
 
@@ -61,32 +64,31 @@ const retrieveInterval = (days = 1) => {
 
     const now = new Date();
 
+    const formatTz = (dateTime: Date) =>
+        formatInTimeZone(dateTime, 'UTC', "yyyy-MM-dd'T'HH:00:00XXX");
+
     // Move to the next full hour
     let nextHour = addHours(now, 1);
-    nextHour.setMinutes(0, 0, 0);
 
     // If the current time is less than 1 minute to the next hour, add another hour
     if (now.getMinutes() === 59) {
         nextHour = addHours(nextHour, 1);
     }
 
-    // Helper function to format the date as local timestamp
-    const formatLocalTime = (date: Date) =>
-        format(date, "yyyy-MM-dd'T'HH:00:00xxx");
+    const period = {
+        startTime: formatTz(nextHour),
+        endTime: formatTz(addDays(nextHour, days)),
+    };
 
-    const startTime = formatLocalTime(nextHour);
-    const endTime = formatLocalTime(addDays(nextHour, days));
-
-    return { startTime, endTime };
+    return period;
 };
 
-const formatDatetime = (dateTime: string) => {
-    const date = format(new Date(dateTime), 'dd MMM');
-    const time = format(new Date(dateTime), 'hh:mm a');
+const formatDateTime = (dateTime: string) => {
+    const date = new Date(dateTime);
 
     return {
-        date,
-        time,
+        date: formatInTimeZone(date, 'IST', 'dd MMM'),
+        time: formatInTimeZone(date, 'IST', 'hh:mm a'),
     };
 };
 
@@ -97,5 +99,5 @@ export {
     formatZodError,
     formatAxiosError,
     retrieveInterval,
-    formatDatetime,
+    formatDateTime,
 };
