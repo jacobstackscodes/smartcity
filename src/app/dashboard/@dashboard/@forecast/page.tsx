@@ -21,7 +21,9 @@ export default async function Page({
         period,
     });
 
-    console.log(period, forecast?.hourlyForecasts);
+    if (!forecast) {
+        throw new Error('Forecast data not found');
+    }
 
-    return <AQIForecast />;
+    return <AQIForecast data={forecast} />;
 }
