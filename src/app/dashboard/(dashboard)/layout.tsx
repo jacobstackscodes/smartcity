@@ -5,6 +5,13 @@ type Props = {
     dashboard: React.ReactNode;
 };
 
+export const metadata: Metadata = {
+    title: 'Dashboard',
+};
+
+export const preferredRegion = 'home';
+export const dynamic = 'force-dynamic';
+
 export default async function Layout({ map, dashboard }: Props) {
     return (
         <main className="relative size-full min-h-dvh pt-[calc(100dvh-9.875rem)]">
@@ -17,7 +24,3 @@ export default async function Layout({ map, dashboard }: Props) {
         </main>
     );
 }
-
-export const metadata: Metadata = {
-    title: 'Dashboard',
-};

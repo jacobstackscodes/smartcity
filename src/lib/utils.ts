@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import clsx, { type ClassArray } from 'clsx';
-import { addHours, addDays, setMinutes } from 'date-fns';
+import { addHours, addDays } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { twMerge } from 'tailwind-merge';
 import { ZodError } from 'zod';
