@@ -30,21 +30,40 @@ export const AQIAdvisory = ({ data }: Props) => {
     return (
         <section className="px-20">
             <h4 className="mb-4 text-lg font-semibold text-black">Advisory</h4>
-            <div className="grid grid-cols-2 gap-2">
-                <Card title="General Population">
-                    {data?.generalPopulation}
-                </Card>
-                <Card title="Elderly">{data?.elderly}</Card>
-                <Card title="Lung Disease Population">
-                    {data?.lungDiseasePopulation}
-                </Card>
-                <Card title="Heart Disease Population">
-                    {data?.heartDiseasePopulation}
-                </Card>
-                <Card title="Athletes">{data?.athletes}</Card>
-                <Card title="Pregnant Women">{data?.pregnantWomen}</Card>
-                <Card title="Children">{data?.children}</Card>
-            </div>
+            <ul className="space-y-2 pl-6">
+                <li className="list-disc">
+                    <span className="font-semibold">General Population: </span>
+                    <span>{data?.generalPopulation}</span>
+                </li>
+                <li className="list-disc">
+                    <span className="font-semibold">Elderly: </span>
+                    <span>{data?.elderly}</span>
+                </li>
+                <li className="list-disc">
+                    <span className="font-semibold">
+                        Lung Disease Population:{' '}
+                    </span>
+                    <span>{data?.lungDiseasePopulation}</span>
+                </li>
+                <li className="list-disc">
+                    <span className="font-semibold">
+                        Heart Disease Population:{' '}
+                    </span>
+                    <span>{data?.heartDiseasePopulation}</span>
+                </li>
+                <li className="list-disc">
+                    <span className="font-semibold">Athletes: </span>
+                    <span>{data?.athletes}</span>
+                </li>
+                <li className="list-disc">
+                    <span className="font-semibold">Pregnant Women: </span>
+                    <span>{data?.pregnantWomen}</span>
+                </li>
+                <li className="list-disc">
+                    <span className="font-semibold">Children: </span>
+                    <span>{data?.children}</span>
+                </li>
+            </ul>
         </section>
     );
 };
