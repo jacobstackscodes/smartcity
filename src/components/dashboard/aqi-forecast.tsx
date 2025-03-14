@@ -41,34 +41,29 @@ export const AQIForecast = ({ data }: Props) => {
     const today = format(new Date(), 'dd MMM');
 
     return (
-        <section className="px-20">
-            <h4 className="mb-4 text-lg font-semibold text-black">
-                Hourly Forecast
-            </h4>
-            <div
-                className="relative scrollbar-none flex cursor-grab flex-nowrap gap-2 overflow-x-auto active:cursor-grabbing"
-                ref={dragscrollRef}
-            >
-                {data?.map((day, index) => (
-                    <div
-                        key={index}
-                        className="flex flex-col items-start justify-center gap-2"
-                    >
-                        <h6 className="sticky top-0 left-0 text-sm font-semibold text-black">
-                            {day.date === today ? 'Today' : day.date}
-                        </h6>
-                        <div className="flex shrink-0 grow divide-x divide-border overflow-hidden rounded-md border border-border">
-                            {day.data?.map((item) => (
-                                <ForecastItem
-                                    key={item.time}
-                                    aqi={item.aqi}
-                                    time={item.time}
-                                />
-                            ))}
-                        </div>
+        <div
+            className="relative scrollbar-none flex cursor-grab flex-nowrap gap-2 overflow-x-auto active:cursor-grabbing"
+            ref={dragscrollRef}
+        >
+            {data?.map((day, index) => (
+                <div
+                    key={index}
+                    className="flex flex-col items-start justify-center gap-2"
+                >
+                    <h6 className="sticky top-0 left-0 text-sm font-semibold text-black">
+                        {day.date === today ? 'Today' : day.date}
+                    </h6>
+                    <div className="flex shrink-0 grow divide-x divide-border overflow-hidden rounded-md border border-border">
+                        {day.data?.map((item) => (
+                            <ForecastItem
+                                key={item.time}
+                                aqi={item.aqi}
+                                time={item.time}
+                            />
+                        ))}
                     </div>
-                ))}
-            </div>
-        </section>
+                </div>
+            ))}
+        </div>
     );
 };

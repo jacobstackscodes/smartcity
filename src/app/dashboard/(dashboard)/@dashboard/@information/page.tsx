@@ -10,11 +10,7 @@ export default async function Page({ searchParams }: Props) {
     const search = (await searchParams).search ?? 'Bangalore';
     const location = await fetchLocation(search);
 
-    if (!location) {
-        throw new Error('Location not found');
-    }
-
-    const current = await fetchAqi(location);
+    const current = location && (await fetchAqi(location));
 
     return (
         <>

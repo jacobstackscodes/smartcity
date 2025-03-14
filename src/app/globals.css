@@ -14,6 +14,9 @@
     --color-card: #f4f5f6;
     --color-muted: oklch(92% 0.02 233.51);
 
+    --color-error: oklch(55.74% 0.224365 21.5634);
+    --color-error-bg: oklch(98.07% 0.009971 1.9774);
+
     --color-border: #bfc7cf;
     --color-input: oklch(80% 0.02 233.51);
 

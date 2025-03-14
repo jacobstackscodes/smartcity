@@ -1,7 +1,6 @@
 import { AQIForecast } from '@/components/dashboard/aqi-forecast';
 import { fetchForecast, fetchLocation } from '@/lib/requests';
 import { retrieveInterval } from '@/lib/utils';
-import { notFound } from 'next/navigation';
 
 export default async function Page({
     searchParams,
@@ -11,19 +10,22 @@ export default async function Page({
     const search = ((await searchParams)?.search as string) ?? 'Bangalore';
     const location = await fetchLocation(search);
 
-    if (!location) {
-        notFound();
-    }
-
     const period = retrieveInterval(2);
-    const forecast = await fetchForecast({
-        location: location.location,
-        period,
-    });
+    const forecast =
+        location &&
+        (await fetchForecast({
+            location: location.location,
+            period,
+        }));
 
-    if (!forecast) {
-        throw new Error('Forecast data not found');
-    }
+    if (!forecast) throw new Error('Forecast data not found');
 
-    return <AQIForecast data={forecast} />;
+    return (
+        <section className="px-20">
+            <h4 className="mb-4 text-lg font-semibold text-black">
+                Hourly Forecast
+            </h4>
+            <AQIForecast data={forecast} />
+        </section>
+    );
 }
