@@ -1,3 +1,4 @@
+import { errorHandler } from '@/lib/error';
 import { GeocodingAPIResponse } from '@/types/google-location';
 import axios from 'axios';
 import { distance } from 'fastest-levenshtein';
@@ -10,15 +11,14 @@ export async function GET(request: NextRequest) {
         const search = request.nextUrl.searchParams.get('search');
 
         if (!search) {
-            return NextResponse.json(
-                { error: 'Search query parameter is required' },
-                { status: 400 },
-            );
+            return NextResponse.json('Search query parameter is required', {
+                status: 400,
+            });
         }
 
         if (!API_KEY) {
             return NextResponse.json(
-                { error: 'Maps API key is missing from environment variables' },
+                'Maps API key is missing from environment variables',
                 { status: 500 },
             );
         }
@@ -38,10 +38,9 @@ export async function GET(request: NextRequest) {
 
         // Handle empty results
         if (!data.results || data.results.length === 0) {
-            return NextResponse.json(
-                { error: 'No results found in Bangalore' },
-                { status: 400 },
-            );
+            return NextResponse.json('No results found in Bangalore', {
+                status: 404,
+            });
         }
 
         // Extract first result
@@ -62,11 +61,8 @@ export async function GET(request: NextRequest) {
         // Only reject if it's a partial match *and* no close match is found
         if (result.length > 1 || (result[0].partial_match && !isCloseMatch)) {
             return NextResponse.json(
-                {
-                    error: 'Received partial match, please provide a more specific location',
-                    result,
-                },
-                { status: 400 },
+                'Received partial match, please provide a more specific location',
+                { status: 404 },
             );
         }
 
@@ -81,19 +77,6 @@ export async function GET(request: NextRequest) {
             { status: 200 },
         );
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            return NextResponse.json(
-                {
-                    error:
-                        error.response?.data || 'Error fetching geocode data',
-                },
-                { status: error.response?.status || 500 },
-            );
-        }
-
-        return NextResponse.json(
-            { error: 'Something went wrong' },
-            { status: 500 },
-        );
+        return errorHandler(error);
     }
 }

@@ -19,13 +19,6 @@ export async function POST(request: NextRequest) {
         }
 
         const validatedBody = await forecastValidator.parseAsync(body);
-
-        console.log(
-            differenceInDays(
-                validatedBody.period.endTime,
-                validatedBody.period.startTime,
-            ),
-        );
         const { data } = await axios.post<ForecastAPIResponse>(
             'https://airquality.googleapis.com/v1/forecast:lookup',
             {

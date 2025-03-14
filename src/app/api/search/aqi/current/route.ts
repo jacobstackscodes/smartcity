@@ -10,10 +10,9 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
 
         if (!AQI_API_KEY) {
-            return NextResponse.json(
-                { error: 'Maps API key is required' },
-                { status: 500 },
-            );
+            return NextResponse.json('Maps API key is required', {
+                status: 500,
+            });
         }
 
         const validatedBody = await currentValidator.parseAsync(body);
