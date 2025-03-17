@@ -1,18 +1,23 @@
-import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
 
-const MONGODB_URI = process.env.MONGO_URI || "mongodb://localhost:27017/smart_city_db";
+// Extend globalThis to include our custom property
+declare global {
+  // eslint-disable-next-line no-var
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
+}
 
-const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) {
-    return;
-  }
+const uri = process.env.MONGODB_URI || "mongodb://localhost:27017";
+const dbName = "smartcity";
+let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
 
-  try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("✅ Connected to MongoDB");
-  } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
-  }
-};
+if (!global._mongoClientPromise) {
+  client = new MongoClient(uri, {});
+  global._mongoClientPromise = client.connect();
+}
+clientPromise = global._mongoClientPromise;
 
-export default connectDB;
+export async function getDb() {
+  const client = await clientPromise;
+  return client.db(dbName);
+}
