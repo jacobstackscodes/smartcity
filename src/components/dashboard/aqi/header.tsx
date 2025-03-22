@@ -1,4 +1,4 @@
-import { Status } from './status';
+import { Status } from '../status';
 import { cn } from '@/lib/utils';
 import { Index } from '@/types/google-aqi';
 import { memo } from 'react';

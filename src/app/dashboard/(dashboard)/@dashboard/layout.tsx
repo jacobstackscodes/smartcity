@@ -1,4 +1,3 @@
-import { AQIHeader } from '@/components/dashboard/aqi-header';
 import { Search } from '@/components/dashboard/search';
 
 type Props = {

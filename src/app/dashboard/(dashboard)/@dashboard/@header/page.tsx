@@ -1,4 +1,4 @@
-import { AQIHeader } from '@/components/dashboard/aqi-header';
+import { AQIHeader } from '@/components/dashboard/aqi';
 import { fetchAqi, fetchLocation } from '@/lib/requests';
 
 type Props = {

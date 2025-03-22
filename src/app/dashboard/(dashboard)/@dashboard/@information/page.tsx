@@ -1,5 +1,4 @@
-import { AQIAdvisory } from '@/components/dashboard/aqi-advisory';
-import { AQIPollutants } from '@/components/dashboard/aqi-pollutants';
+import { AQIAdvisory, AQIPollutants } from '@/components/dashboard/aqi';
 import { fetchAqi, fetchLocation } from '@/lib/requests';
 
 type Props = {

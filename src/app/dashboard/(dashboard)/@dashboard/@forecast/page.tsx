@@ -1,4 +1,4 @@
-import { AQIForecast } from '@/components/dashboard/aqi-forecast';
+import { AQIForecast } from '@/components/dashboard/aqi';
 import { fetchForecast, fetchLocation } from '@/lib/requests';
 import { retrieveInterval } from '@/lib/utils';
 
