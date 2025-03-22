@@ -6,31 +6,42 @@ export const useSearch = (key: string = 'search') => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const [value, setValue] = useState('');
+    const initialValue = searchParams.get(key) || '';
+    const [value, setValue] = useState(initialValue);
 
-    const createQueryString = useMemo(
-        () => (name: string, value: string) => {
-            const params = new URLSearchParams(searchParams.toString());
+    const createQueryString = useCallback(
+        (value: string) => {
+            const params = new URLSearchParams(searchParams);
             if (value) {
-                params.set(name, value);
+                params.set(key, value);
             } else {
-                params.delete(name);
+                params.delete(key);
             }
             return params.toString();
         },
-        [searchParams],
+        [searchParams, key],
+    );
+
+    const searchUrl = useMemo(
+        () => `${pathname}?${createQueryString(value)}`,
+        [pathname, createQueryString, value],
     );
 
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value),
         [],
     );
-    const handleSearch = useCallback(() => {
-        router.push(`${pathname}?${createQueryString(key, value)}`, {
-            scroll: false,
-        });
-        setValue('');
-    }, [router, pathname, createQueryString, value, key]);
+    const handleSearch = useCallback(
+        (
+            e:
+                | React.KeyboardEvent<HTMLInputElement>
+                | React.MouseEvent<HTMLButtonElement>,
+        ) => {
+            if ('key' in e && e.key !== 'Enter') return;
+            router.push(searchUrl, { scroll: false });
+        },
+        [router, searchUrl],
+    );
 
     return {
         value,

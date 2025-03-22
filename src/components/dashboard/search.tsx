@@ -13,7 +13,7 @@ export const Search = () => {
                 placeholder="Search a locality inside Bangalore"
                 value={value}
                 onChange={handleChange}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={handleSearch}
             />
             <button
                 type="button"
