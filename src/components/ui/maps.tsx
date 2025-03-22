@@ -35,19 +35,18 @@ const Map: React.FC<{ position: Position; children?: React.ReactNode }> = ({
         if (!mapRef.current || map) return;
 
         const { Map, RenderingType } = await loader.importLibrary('maps');
-        const _map = new Map(mapRef.current, {
+
+        const newMap = new Map(mapRef.current, {
             center: { lat: position.latitude, lng: position.longitude },
             zoom: 14,
             disableDefaultUI: true,
             clickableIcons: false,
-            mapId: '67af307b850dc59d', // Replace with your map ID
+            mapId: '67af307b850dc59d',
             renderingType: RenderingType.VECTOR,
         });
+        setMap(newMap);
+    }, [map, setMap]);
 
-        setMap(_map);
-    }, [setMap, mapRef]);
-
-    // Initialize the map once
     useEffect(() => {
         initializeMap();
 
@@ -55,20 +54,13 @@ const Map: React.FC<{ position: Position; children?: React.ReactNode }> = ({
             mapRef.current = null;
             setMap(null);
         };
-    }, [map, setMap, position]);
+    }, [initializeMap, map, setMap]);
 
-    // Pan to new position when it changes
     useEffect(() => {
-        if (!map) return;
-        const currentCenter = map.getCenter();
-        if (
-            currentCenter &&
-            (currentCenter.lat() !== position.latitude ||
-                currentCenter.lng() !== position.longitude)
-        ) {
-            map.panTo({ lat: position.latitude, lng: position.longitude });
+        if (map) {
+            map.setCenter({ lat: position.latitude, lng: position.longitude });
         }
-    }, [map, position]);
+    }, [map, position.latitude, position.longitude]);
 
     return (
         <div ref={mapRef} className="size-full">
@@ -85,10 +77,6 @@ const TrafficLayer: React.FC = () => {
 
         const trafficLayer = new google.maps.TrafficLayer();
         trafficLayer.setMap(map);
-
-        return () => {
-            trafficLayer.setMap(null);
-        };
     }, [map]);
 
     return null;
@@ -100,21 +88,21 @@ const AdvancedMarker: React.FC<{ position: Position }> = ({ position }) => {
         null,
     );
 
-    // Create the marker when map is available
-    useEffect(() => {
-        if (!map) return;
+    const initializeMarker = useCallback(async () => {
+        if (!map || markerRef.current) return;
 
-        loader.importLibrary('marker').then(({ AdvancedMarkerElement }) => {
-            if (!markerRef.current) {
-                markerRef.current = new AdvancedMarkerElement({
-                    map,
-                    position: new google.maps.LatLng(
-                        position.latitude,
-                        position.longitude,
-                    ),
-                });
-            }
+        const { AdvancedMarkerElement } = await loader.importLibrary('marker');
+        const marker = new AdvancedMarkerElement({
+            map,
+            position: { lat: position.latitude, lng: position.longitude },
         });
+        markerRef.current = marker;
+    }, [map, position.latitude, position.longitude]);
+
+    useEffect(() => {
+        if (map && !markerRef.current) {
+            initializeMarker();
+        }
 
         return () => {
             if (markerRef.current) {
@@ -124,15 +112,15 @@ const AdvancedMarker: React.FC<{ position: Position }> = ({ position }) => {
         };
     }, [map]);
 
-    // Update marker position when position changes
     useEffect(() => {
-        if (markerRef.current && position) {
-            markerRef.current.position = new google.maps.LatLng(
-                position.latitude,
-                position.longitude,
-            );
+        if (markerRef.current && map) {
+            markerRef.current.position = {
+                lat: position.latitude,
+                lng: position.longitude,
+            };
+            markerRef.current.map = map;
         }
-    }, [position]);
+    }, [map, position.latitude, position.longitude]);
 
     return null;
 };
