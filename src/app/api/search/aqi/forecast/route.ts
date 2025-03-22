@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { cache } from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { differenceInDays } from 'date-fns';
 
@@ -8,40 +9,29 @@ import { formatDateTime } from '@/lib/utils';
 
 const FORECAST_API_KEY = process.env.NEXT_PUBLIC_MAPS_API_KEY as string;
 
-export async function POST(request: NextRequest) {
-    try {
-        const body = await request.json();
-
-        if (!FORECAST_API_KEY) {
-            return NextResponse.json('Maps API key is required', {
-                status: 500,
-            });
-        }
-
-        const validatedBody = await forecastValidator.parseAsync(body);
+const fetchForecastAQI = cache(
+    async (
+        location: { latitude: number; longitude: number },
+        period: { startTime: string; endTime: string },
+    ) => {
         const { data } = await axios.post<ForecastAPIResponse>(
             'https://airquality.googleapis.com/v1/forecast:lookup',
             {
-                location: validatedBody.location,
-                period: validatedBody.period,
+                location,
+                period,
                 pageSize:
-                    differenceInDays(
-                        validatedBody.period.endTime,
-                        validatedBody.period.startTime,
-                    ) * 24,
+                    differenceInDays(period.endTime, period.startTime) * 24,
                 universalAqi: false,
                 extraComputations: ['LOCAL_AQI'],
                 customLocalAqis: [{ regionCode: 'IN', aqi: 'usa_epa' }],
             },
             {
-                params: {
-                    key: FORECAST_API_KEY,
-                },
+                params: { key: FORECAST_API_KEY },
             },
         );
 
         if (!data) {
-            return NextResponse.json('No data found', { status: 404 });
+            throw new Error('No data found');
         }
 
         const response = data.hourlyForecasts.reduce(
@@ -55,12 +45,30 @@ export async function POST(request: NextRequest) {
             {} as Record<string, { time: string; aqi: number }[]>,
         );
 
-        const formattedResponse = Object.entries(response).map(
-            ([date, data]) => ({ date, data }),
+        return Object.entries(response).map(([date, data]) => ({ date, data }));
+    },
+);
+
+export async function POST(request: NextRequest) {
+    try {
+        const body = await request.json();
+
+        if (!FORECAST_API_KEY) {
+            return NextResponse.json('Maps API key is required', {
+                status: 500,
+            });
+        }
+
+        const validatedBody = await forecastValidator.parseAsync(body);
+        const data = await fetchForecastAQI(
+            validatedBody.location,
+            validatedBody.period,
         );
 
-        return NextResponse.json(formattedResponse, { status: 200 });
+        return NextResponse.json(data, { status: 200 });
     } catch (error) {
         return errorHandler(error);
     }
 }
+
+export const revalidate = 3600;
