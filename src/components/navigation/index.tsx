@@ -8,7 +8,7 @@ export const Navigation = () => {
                 <nav>
                     <ul className="flex list-none gap-2">
                         <NavItem href="/">Home</NavItem>
-                        <NavItem href="/crime">Crime</NavItem>
+                        <NavItem href="/insights">Insights</NavItem>
                         <NavItem href="/dashboard">Dashboard</NavItem>
                     </ul>
                 </nav>
