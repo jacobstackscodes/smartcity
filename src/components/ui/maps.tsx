@@ -1,7 +1,7 @@
 'use client';
 
 import { Loader } from '@googlemaps/js-api-loader';
-import { useEffect, useRef, useMemo, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { create } from 'zustand';
 
 interface MapStore {
@@ -96,9 +96,34 @@ const AdvancedMarker: React.FC = () => {
                 markerRef.current = null;
             }
         };
-    }, [map, position]);
+    }, [map, position.latitude, position.longitude, title, color]);
 
     return null;
 };
 
-export { Map, AdvancedMarker };
+// Multi-Marker Map Component
+interface MarkerData {
+    position: { latitude: number; longitude: number };
+    title: string;
+    color: string;
+  }
+
+const MultiMarkerMap: React.FC<{
+    position: { latitude: number; longitude: number };
+    markers: MarkerData[];
+  }> = ({ position, markers }) => {
+    return (
+      <Map position={position}>
+        {markers.map((marker, index) => (
+          <AdvancedMarker
+            key={index}
+            position={marker.position}
+            title={marker.title}
+            color={marker.color}
+          />
+        ))}
+      </Map>
+    );
+  };
+
+export { Map, AdvancedMarker, MultiMarkerMap };
