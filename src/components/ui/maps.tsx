@@ -1,21 +1,22 @@
 'use client';
 
 import { Loader } from '@googlemaps/js-api-loader';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { create } from 'zustand';
 
 interface MapStore {
     map: google.maps.Map | null;
     setMap: (map: google.maps.Map | null) => void;
-    position: { latitude: number; longitude: number } | null;
-    setPosition: (position: { latitude: number; longitude: number }) => void;
+}
+
+interface Position {
+    latitude: number;
+    longitude: number;
 }
 
 const useMapStore = create<MapStore>((set) => ({
     map: null,
     setMap: (map) => set({ map }),
-    position: null,
-    setPosition: (position) => set({ position }),
 }));
 
 const loader = new Loader({
@@ -23,71 +24,96 @@ const loader = new Loader({
     apiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
 });
 
-const Map: React.FC<{
-    position: { latitude: number; longitude: number };
-    children?: React.ReactNode;
-}> = ({ position, children }) => {
+const Map: React.FC<{ position: Position; children?: React.ReactNode }> = ({
+    position,
+    children,
+}) => {
     const mapRef = useRef<HTMLDivElement>(null);
-    const { map, setMap, setPosition } = useMapStore();
+    const { map, setMap } = useMapStore();
 
-    useEffect(() => {
+    const initializeMap = useCallback(async () => {
         if (!mapRef.current || map) return;
 
-        (async () => {
-            const { Map, RenderingType } = await loader.importLibrary('maps');
-            const _map = new Map(mapRef.current!, {
-                center: { lat: position.latitude, lng: position.longitude },
-                zoom: 14,
-                disableDefaultUI: true,
-                clickableIcons: false,
-                mapId: '67af307b850dc59d',
-                renderingType: RenderingType.VECTOR,
-            });
+        const { Map, RenderingType } = await loader.importLibrary('maps');
+        const _map = new Map(mapRef.current, {
+            center: { lat: position.latitude, lng: position.longitude },
+            zoom: 14,
+            disableDefaultUI: true,
+            clickableIcons: false,
+            mapId: '67af307b850dc59d', // Replace with your map ID
+            renderingType: RenderingType.VECTOR,
+        });
 
-            setMap(_map);
-            setPosition(position);
+        setMap(_map);
+    }, [setMap, mapRef]);
 
-            new google.maps.TrafficLayer().setMap(_map);
-        })();
-    }, [map, setMap, setPosition, position]);
-
+    // Initialize the map once
     useEffect(() => {
-        if (map) {
-            map.panTo({ lat: position.latitude, lng: position.longitude });
-            setPosition(position);
-        }
-    }, [map, position, setPosition]);
+        initializeMap();
 
-    useEffect(() => () => setMap(null), [setMap]);
+        return () => {
+            mapRef.current = null;
+            setMap(null);
+        };
+    }, [map, setMap, position]);
+
+    // Pan to new position when it changes
+    useEffect(() => {
+        if (!map) return;
+        const currentCenter = map.getCenter();
+        if (
+            currentCenter &&
+            (currentCenter.lat() !== position.latitude ||
+                currentCenter.lng() !== position.longitude)
+        ) {
+            map.panTo({ lat: position.latitude, lng: position.longitude });
+        }
+    }, [map, position]);
 
     return (
-        <div ref={mapRef} style={{ height: '100%', width: '100%' }}>
+        <div ref={mapRef} className="size-full">
             {children}
         </div>
     );
 };
 
-const AdvancedMarker: React.FC = () => {
-    const { map, position } = useMapStore();
+const TrafficLayer: React.FC = () => {
+    const { map } = useMapStore();
+
+    useEffect(() => {
+        if (!map) return;
+
+        const trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
+
+        return () => {
+            trafficLayer.setMap(null);
+        };
+    }, [map]);
+
+    return null;
+};
+
+const AdvancedMarker: React.FC<{ position: Position }> = ({ position }) => {
+    const { map } = useMapStore();
     const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(
         null,
     );
 
+    // Create the marker when map is available
     useEffect(() => {
-        if (!map || !position) return;
+        if (!map) return;
 
         loader.importLibrary('marker').then(({ AdvancedMarkerElement }) => {
-            if (markerRef.current) {
-                markerRef.current.map = null; // Detach old marker
+            if (!markerRef.current) {
+                markerRef.current = new AdvancedMarkerElement({
+                    map,
+                    position: new google.maps.LatLng(
+                        position.latitude,
+                        position.longitude,
+                    ),
+                });
             }
-
-            markerRef.current = new AdvancedMarkerElement({
-                map,
-                position: new google.maps.LatLng(
-                    position.latitude,
-                    position.longitude,
-                ),
-            });
         });
 
         return () => {
@@ -96,34 +122,19 @@ const AdvancedMarker: React.FC = () => {
                 markerRef.current = null;
             }
         };
-    }, [map, position.latitude, position.longitude, title, color]);
+    }, [map]);
+
+    // Update marker position when position changes
+    useEffect(() => {
+        if (markerRef.current && position) {
+            markerRef.current.position = new google.maps.LatLng(
+                position.latitude,
+                position.longitude,
+            );
+        }
+    }, [position]);
 
     return null;
 };
 
-// Multi-Marker Map Component
-interface MarkerData {
-    position: { latitude: number; longitude: number };
-    title: string;
-    color: string;
-  }
-
-const MultiMarkerMap: React.FC<{
-    position: { latitude: number; longitude: number };
-    markers: MarkerData[];
-  }> = ({ position, markers }) => {
-    return (
-      <Map position={position}>
-        {markers.map((marker, index) => (
-          <AdvancedMarker
-            key={index}
-            position={marker.position}
-            title={marker.title}
-            color={marker.color}
-          />
-        ))}
-      </Map>
-    );
-  };
-
-export { Map, AdvancedMarker, MultiMarkerMap };
+export { Map, AdvancedMarker, TrafficLayer };
