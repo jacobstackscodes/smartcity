@@ -1,4 +1,3 @@
-import { AdvancedMarker, Map } from '@/components/ui/maps';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -6,7 +5,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    const position = { latitude: 12.971599, longitude: 77.594566 };
-
-    return <Map position={position}></Map>;
+    return (
+        <div className="wrapper min-h-screen border-x border-border bg-white pt-16">
+            <main className="w-full py-8"></main>
+        </div>
+    );
 }

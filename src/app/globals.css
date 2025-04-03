@@ -9,6 +9,7 @@
     --breakpoint-xl: 1200px;
     --breakpoint-xxl: 1400px;
 
+    --color-background: oklch(0.96 0 0);
     --color-foreground: oklch(7.97% 0.0166 233.51);
     --color-primary: #007bff;
     --color-card: #f4f5f6;
@@ -136,5 +137,5 @@
 
 html,
 body {
-    @apply size-full bg-white text-foreground;
+    @apply size-full bg-background text-foreground;
 }
