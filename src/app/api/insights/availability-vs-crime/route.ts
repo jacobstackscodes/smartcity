@@ -1,29 +1,30 @@
-import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
+// app/api/insights/availability-vs-crime/route.ts
+import { NextResponse } from 'next/server'
+import { connectDB } from '@/server/mongoose'
+import  Houses  from '@/server/schema/houses'
+import  Crime  from '@/server/schema/crime'
 
-interface AvailabilityVsCrimeResult {
-  _id: number;
-  avgPrice: number;
-  crimeCount: number;
-}
+export async function GET() {
+  await connectDB()
 
-export async function GET(): Promise<NextResponse<AvailabilityVsCrimeResult[] | { error: string }>> {
-  try {
-    const db = await getDb();
-    const result = (await db.collection("properties").aggregate([
-      { $match: { availability: "Ready To Move" } },
-      { $lookup: { from: "crimes", localField: "city", foreignField: "city", as: "crimes" } },
-      { $unwind: "$crimes" },
-      {
-        $group: {
-          _id: { $year: "$crimes.dateReported" },
-          avgPrice: { $avg: "$price" },
-          crimeCount: { $sum: 1 },
-        },
-      },
-    ]).toArray()) as AvailabilityVsCrimeResult[];
-    return NextResponse.json(result);
-  } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
-  }
+  const houses = await Houses.find({})
+  const crimes = await Crime.find({})
+
+  const data: Record<string, { availability: number; crimeCount: number }> = {}
+
+  houses.forEach(house => {
+    const loc = house.location?.trim()
+    const isAvailable = house.availability?.includes('Ready') ? 1 : 0
+    if (!data[loc]) data[loc] = { availability: 0, crimeCount: 0 }
+    data[loc].availability += isAvailable
+  })
+
+  crimes.forEach(crime => {
+    const loc = crime.Area?.trim()
+    if (data[loc]) {
+      data[loc].crimeCount += crime.CrimeCount || 0
+    }
+  })
+
+  return NextResponse.json(data)
 }
