@@ -1,46 +1,30 @@
-import { connectToDB } from '@/server/mongoose';
-import House from '@/server/schema/houses';
-import Crime from '@/server/schema/crime';
 import { NextResponse } from 'next/server';
+import { connectToDB } from '@/server/mongoose';
+import Houses from '@/server/schema/houses';
+import Crime from '@/server/schema/crime';
 
 export async function GET() {
     await connectToDB();
 
-    const houses = await House.aggregate([
-        {
-            $group: {
-                _id: { location: '$location', availability: '$availability' },
-                count: { $sum: 1 },
-            },
-        },
-    ]);
+    const houses = await Houses.find({});
+    const crimes = await Crime.find({});
 
-    const crimes = await Crime.aggregate([
-        {
-            $group: {
-                _id: '$city',
-                crimeCount: { $sum: 1 },
-            },
-        },
-    ]);
+    const data: Record<string, { availability: number; crimeCount: number }> =
+        {};
 
-    const merged = {};
-
-    houses.forEach(({ _id, count }) => {
-        const { location, availability } = _id;
-        if (!merged[location]) merged[location] = { location };
-        merged[location][
-            availability === 'Ready To Move'
-                ? 'readyToMove'
-                : 'underConstruction'
-        ] = count;
+    houses.forEach((house) => {
+        const loc = house.location?.trim();
+        const isAvailable = house.availability?.includes('Ready') ? 1 : 0;
+        if (!data[loc]) data[loc] = { availability: 0, crimeCount: 0 };
+        data[loc].availability += isAvailable;
     });
 
-    crimes.forEach(({ _id, crimeCount }) => {
-        const location = _id;
-        if (!merged[location]) merged[location] = { location };
-        merged[location].crimeCount = crimeCount;
+    crimes.forEach((crime) => {
+        const loc = crime.Area?.trim();
+        if (data[loc]) {
+            data[loc].crimeCount += crime.CrimeCount || 0;
+        }
     });
 
-    return NextResponse.json(Object.values(merged));
+    return NextResponse.json(data);
 }
