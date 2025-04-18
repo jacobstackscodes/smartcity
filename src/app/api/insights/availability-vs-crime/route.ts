@@ -1,29 +1,46 @@
-import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
+import { connectToDB } from '@/server/mongoose';
+import House from '@/server/schema/houses';
+import Crime from '@/server/schema/crime';
+import { NextResponse } from 'next/server';
 
-interface AvailabilityVsCrimeResult {
-  _id: number;
-  avgPrice: number;
-  crimeCount: number;
-}
+export async function GET() {
+    await connectToDB();
 
-export async function GET(): Promise<NextResponse<AvailabilityVsCrimeResult[] | { error: string }>> {
-  try {
-    const db = await getDb();
-    const result = (await db.collection("properties").aggregate([
-      { $match: { availability: "Ready To Move" } },
-      { $lookup: { from: "crimes", localField: "city", foreignField: "city", as: "crimes" } },
-      { $unwind: "$crimes" },
-      {
-        $group: {
-          _id: { $year: "$crimes.dateReported" },
-          avgPrice: { $avg: "$price" },
-          crimeCount: { $sum: 1 },
+    const houses = await House.aggregate([
+        {
+            $group: {
+                _id: { location: '$location', availability: '$availability' },
+                count: { $sum: 1 },
+            },
         },
-      },
-    ]).toArray()) as AvailabilityVsCrimeResult[];
-    return NextResponse.json(result);
-  } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
-  }
+    ]);
+
+    const crimes = await Crime.aggregate([
+        {
+            $group: {
+                _id: '$city',
+                crimeCount: { $sum: 1 },
+            },
+        },
+    ]);
+
+    const merged = {};
+
+    houses.forEach(({ _id, count }) => {
+        const { location, availability } = _id;
+        if (!merged[location]) merged[location] = { location };
+        merged[location][
+            availability === 'Ready To Move'
+                ? 'readyToMove'
+                : 'underConstruction'
+        ] = count;
+    });
+
+    crimes.forEach(({ _id, crimeCount }) => {
+        const location = _id;
+        if (!merged[location]) merged[location] = { location };
+        merged[location].crimeCount = crimeCount;
+    });
+
+    return NextResponse.json(Object.values(merged));
 }

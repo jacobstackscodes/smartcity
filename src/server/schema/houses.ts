@@ -28,4 +28,4 @@ const HouseSchema: Schema = new Schema(
 );
 
 export default mongoose.models.House ||
-    mongoose.model<IHouse>('House', HouseSchema);
+    mongoose.model<IHouse>('House', HouseSchema, 'house');

@@ -1,17 +1,22 @@
 import mongoose from 'mongoose';
 
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const dbName = 'smartcity';
+const uri = process.env.MONGODB_URI;
 
 let cachedConnection: mongoose.Connection | null = null;
 
-export async function connectToDatabase() {
+export async function connectToDB() {
+    if (!uri) {
+        throw new Error(
+            'Please define the MONGODB_URI environment variable inside .env.local',
+        );
+    }
+
     if (cachedConnection && mongoose.connection.readyState === 1) {
         return cachedConnection;
     }
 
     try {
-        await mongoose.connect(uri, { dbName });
+        await mongoose.connect(uri);
         cachedConnection = mongoose.connection;
         console.log('Connected to MongoDB');
         return cachedConnection;

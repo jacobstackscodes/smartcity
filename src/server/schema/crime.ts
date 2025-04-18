@@ -37,8 +37,5 @@ const CrimeSchema: Schema = new Schema(
     { timestamps: true }, // Adds createdAt and updatedAt
 );
 
-// Ensure uniqueness of reportNumber
-CrimeSchema.index({ reportNumber: 1 }, { unique: true });
-
 export default mongoose.models.Crime ||
-    mongoose.model<ICrime>('Crime', CrimeSchema);
+    mongoose.model<ICrime>('Crime', CrimeSchema, 'crime');
