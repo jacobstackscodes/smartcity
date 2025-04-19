@@ -1,28 +1,31 @@
-// lib/db.ts
 import mongoose from 'mongoose';
 
-const uri = process.env.MONGODB_URI;
+const MONGODB_URI =
+    process.env.MONGODB_URI || 'mongodb://localhost:27017/smartcity';
 
-let cachedConnection: mongoose.Connection | null = null;
+let isConnected = false;
 
-export async function connectToDB() {
-    if (!uri) {
-        throw new Error(
-            'Please define the MONGODB_URI environment variable inside .env.local',
-        );
-    }
-
-    if (cachedConnection && mongoose.connection.readyState === 1) {
-        return cachedConnection;
-    }
-
+export async function db<T>(fn: () => Promise<T>): Promise<T> {
     try {
-        await mongoose.connect(uri);
-        cachedConnection = mongoose.connection;
-        console.log('Connected to MongoDB');
-        return cachedConnection;
+        if (!MONGODB_URI) {
+            throw new Error('MONGODB_URI is not defined in .env.local');
+        }
+
+        if (mongoose.connection.readyState === 0) {
+            await mongoose.connect(MONGODB_URI, {
+                dbName: 'smartcity',
+            });
+            isConnected = true;
+        }
+
+        return await fn();
     } catch (error) {
-        console.error('MongoDB connection error:', error);
+        console.error('Database operation failed:', error);
         throw error;
+    } finally {
+        if (mongoose.connection.readyState !== 0 && isConnected) {
+            await mongoose.connection.close();
+            isConnected = false;
+        }
     }
 }

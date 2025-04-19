@@ -1,41 +1,27 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, InferSchemaType } from 'mongoose';
 
-export interface ICrime extends Document {
-    reportNumber: number;
-    dateReported: Date;
-    dateOfOccurrence: Date;
-    timeOfOccurrence: Date;
-    city: string;
-    crimeCode: number;
-    crimeDescription: string;
-    victimAge: number;
-    victimGender: 'M' | 'F' | null;
-    weaponUsed: string | null;
-    crimeDomain: string;
-    policeDeployed: number;
-    caseClosed: boolean;
-    dateCaseClosed: Date | null;
-}
-
-const CrimeSchema: Schema = new Schema(
+const crimeSchema = new Schema(
     {
-        reportNumber: { type: Number, required: true, unique: true },
-        dateReported: { type: Date, required: true },
-        dateOfOccurrence: { type: Date, required: true },
-        timeOfOccurrence: { type: Date, required: true },
+        reportNumber: { type: Number, required: true },
+        dateReported: { type: String, required: true },
+        dateOfOccurrence: { type: String, required: true },
+        timeOfOccurrence: { type: String, required: true },
         city: { type: String, required: true },
         crimeCode: { type: Number, required: true },
         crimeDescription: { type: String, required: true },
         victimAge: { type: Number, required: true },
-        victimGender: { type: String, enum: ['M', 'F', null], default: null },
-        weaponUsed: { type: String, default: null },
+        victimGender: { type: String, required: true },
+        weaponUsed: { type: String, required: true },
         crimeDomain: { type: String, required: true },
         policeDeployed: { type: Number, required: true },
-        caseClosed: { type: Boolean, required: true },
-        dateCaseClosed: { type: Date, default: null },
+        caseClosed: { type: String, required: true },
+        dateCaseClosed: { type: String },
     },
-    { timestamps: true }, // Adds createdAt and updatedAt
+    {
+        collection: 'crime', // 👈 prevent pluralization
+    },
 );
 
-export default mongoose.models.Crime ||
-    mongoose.model<ICrime>('Crime', CrimeSchema, 'crime');
+export type CrimeType = InferSchemaType<typeof crimeSchema>;
+export const Crime =
+    mongoose.models.Crime || mongoose.model('Crime', crimeSchema);
