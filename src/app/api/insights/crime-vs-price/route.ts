@@ -2,8 +2,10 @@ import { db } from '@/server/mongoose';
 import { House } from '@/server/schema/house';
 
 export async function GET() {
-    const data = await db(() =>
-        House.aggregate([
+    const data = await db(async (conn) => {
+        const house = House(conn);
+
+        return await house.aggregate([
             // Group houses by region, calculating total price and count.
             {
                 $group: {
@@ -31,8 +33,8 @@ export async function GET() {
                     crimeCount: { $size: '$crimeData' },
                 },
             },
-        ]),
-    );
+        ]);
+    });
 
     return Response.json(data);
 }

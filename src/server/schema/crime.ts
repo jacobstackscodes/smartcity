@@ -1,4 +1,4 @@
-import mongoose, { Schema, InferSchemaType } from 'mongoose';
+import mongoose, { Schema, InferSchemaType, Connection } from 'mongoose';
 
 const crimeSchema = new Schema(
     {
@@ -22,6 +22,10 @@ const crimeSchema = new Schema(
     },
 );
 
-export type CrimeType = InferSchemaType<typeof crimeSchema>;
-export const Crime =
-    mongoose.models.Crime || mongoose.model('Crime', crimeSchema);
+const Crime = (conn: Connection) =>
+    conn.models.Crime || conn.model<CrimeType>('Crime', crimeSchema);
+
+type CrimeType = InferSchemaType<typeof crimeSchema>;
+
+export { Crime };
+export type { CrimeType };

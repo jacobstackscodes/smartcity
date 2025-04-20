@@ -9,8 +9,10 @@ function capitalize(input: string): string {
 
 export async function GET() {
     const data: { count: number; crimeType: string }[] = (
-        await db(() =>
-            Crime.aggregate([
+        await db(async (conn) => {
+            const crime = Crime(conn);
+
+            return await crime.aggregate([
                 {
                     $group: {
                         _id: '$crimeDescription',
@@ -24,8 +26,8 @@ export async function GET() {
                         count: 1,
                     },
                 },
-            ]),
-        )
+            ]);
+        })
     ).map((item) => ({
         ...item,
         crimeType: capitalize(item.crimeType),

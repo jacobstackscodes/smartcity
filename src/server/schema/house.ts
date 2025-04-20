@@ -1,4 +1,4 @@
-import mongoose, { Schema, InferSchemaType } from 'mongoose';
+import mongoose, { Schema, InferSchemaType, Connection } from 'mongoose';
 
 const houseSchema = new Schema(
     {
@@ -18,6 +18,10 @@ const houseSchema = new Schema(
     },
 );
 
-export type HouseType = InferSchemaType<typeof houseSchema>;
-export const House =
-    mongoose.models.House || mongoose.model('House', houseSchema);
+const House = (conn: Connection) =>
+    conn.models.House || conn.model<HouseType>('House', houseSchema);
+
+type HouseType = InferSchemaType<typeof houseSchema>;
+
+export { House };
+export type { HouseType };

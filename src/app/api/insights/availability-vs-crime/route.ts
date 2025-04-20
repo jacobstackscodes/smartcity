@@ -2,8 +2,10 @@ import { db } from '@/server/mongoose';
 import { House } from '@/server/schema/house';
 
 export async function GET() {
-    const data = await db(() =>
-        House.aggregate([
+    const data = await db(async (conn) => {
+        const house = House(conn);
+
+        return await house.aggregate([
             // Filter out missing availability or region
             {
                 $match: {
@@ -25,7 +27,11 @@ export async function GET() {
                     from: 'crime',
                     let: { regions: '$regions' },
                     pipeline: [
-                        { $match: { $expr: { $in: ['$city', '$$regions'] } } },
+                        {
+                            $match: {
+                                $expr: { $in: ['$city', '$$regions'] },
+                            },
+                        },
                         { $count: 'crimeCount' },
                     ],
                     as: 'crimeStats',
@@ -74,8 +80,8 @@ export async function GET() {
                     avgZoneCrimeCount: 1,
                 },
             },
-        ]),
-    );
+        ]);
+    });
 
     return Response.json(data);
 }

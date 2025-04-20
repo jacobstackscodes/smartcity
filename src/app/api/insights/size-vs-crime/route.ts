@@ -2,8 +2,10 @@ import { db } from '@/server/mongoose';
 import { House } from '@/server/schema/house';
 
 export async function GET() {
-    const data = await db(() =>
-        House.aggregate([
+    const data = await db(async (conn) => {
+        const house = House(conn);
+
+        return await house.aggregate([
             // Filter out houses missing the size or region fields.
             {
                 $match: {
@@ -75,8 +77,8 @@ export async function GET() {
                     avgZoneCrimeCount: 1,
                 },
             },
-        ]),
-    );
+        ]);
+    });
 
     return Response.json(data);
 }

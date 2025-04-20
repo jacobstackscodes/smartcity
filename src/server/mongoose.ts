@@ -1,31 +1,28 @@
-import mongoose from 'mongoose';
+import mongoose, { Connection } from 'mongoose';
 
 const MONGODB_URI =
     process.env.MONGODB_URI || 'mongodb://localhost:27017/smartcity';
 
-let isConnected = false;
+if (!MONGODB_URI) {
+    throw new Error('MONGODB_URI is not defined in .env.local');
+}
 
-export async function db<T>(fn: () => Promise<T>): Promise<T> {
+export async function db<T>(fn: (conn: Connection) => Promise<T>): Promise<T> {
+    // 👇 This creates an independent connection instance
+    const connection = await mongoose
+        .createConnection(MONGODB_URI, {
+            dbName: 'smartcity',
+        })
+        .asPromise();
+
     try {
-        if (!MONGODB_URI) {
-            throw new Error('MONGODB_URI is not defined in .env.local');
-        }
-
-        if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(MONGODB_URI, {
-                dbName: 'smartcity',
-            });
-            isConnected = true;
-        }
-
-        return await fn();
+        // 👇 Pass the isolated connection to the caller
+        return await fn(connection);
     } catch (error) {
         console.error('Database operation failed:', error);
         throw error;
     } finally {
-        if (mongoose.connection.readyState !== 0 && isConnected) {
-            await mongoose.connection.close();
-            isConnected = false;
-        }
+        // 👇 Close only this connection (does NOT affect other requests)
+        await connection.close();
     }
 }
