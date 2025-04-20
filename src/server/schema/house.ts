@@ -11,6 +11,7 @@ const houseSchema = new Schema(
         bath: { type: Number, required: false },
         balcony: { type: Number, required: false },
         price: { type: Number, required: true },
+        region: { type: String, required: false },
     },
     {
         collection: 'house', // 👈 prevent pluralization
