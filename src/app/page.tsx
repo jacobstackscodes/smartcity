@@ -87,7 +87,6 @@ export default function Home() {
                 <div className="wrapper">
                     <p>
                         &copy; 2025 Smart City Dashboard. All Rights Reserved.
-                        Created by Nathanael D&apos;Cunha
                     </p>
                 </div>
             </footer>
