@@ -2,15 +2,23 @@ import {
     PriceVsCrimeChart,
     type PriceVsCrimeData,
 } from '@/components/insights/price-vs-crime-by-region';
-import { req } from '@/lib/requests';
+import { baseUrl } from '@/lib/utils';
 
 export default async function Page() {
-    const { data } = await req.get<PriceVsCrimeData[]>(
-        '/api/insights/price-vs-crime',
-    );
+    const response = await fetch(baseUrl('/api/insights/price-vs-crime'), {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        },
+    });
 
-    if (!data || data.length === 0)
-        throw new Error('No data available for the chart');
+    if (!response.ok) {
+        throw new Error('Failed to fetch data');
+    }
+
+    const data = (await response.json()) as PriceVsCrimeData[];
 
     return <PriceVsCrimeChart data={data} />;
 }

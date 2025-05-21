@@ -2,15 +2,26 @@ import {
     CaseStatusChart,
     type CaseStatusData,
 } from '@/components/insights/closed-vs-open-cases';
-import { req } from '@/lib/requests';
+import { baseUrl } from '@/lib/utils';
 
 export default async function Page() {
-    const { data } = await req.get<CaseStatusData[]>(
-        '/api/insights/closed-vs-open-cases',
+    const response = await fetch(
+        baseUrl('/api/insights/closed-vs-open-cases'),
+        {
+            method: 'GET',
+            cache: 'no-store',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        },
     );
 
-    if (!data || data.length === 0)
-        throw new Error('No data available for the chart');
+    if (!response.ok) {
+        throw new Error('Failed to fetch data');
+    }
+
+    const data = (await response.json()) as CaseStatusData[];
 
     return <CaseStatusChart data={data} />;
 }

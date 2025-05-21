@@ -2,15 +2,16 @@ import {
     AvgPriceByRegionChart,
     type PriceByRegion,
 } from '@/components/insights/avg-price-by-region';
-import { req } from '@/lib/requests';
+import { baseUrl } from '@/lib/utils';
 
 export default async function Page() {
-    const { data } = await req.get<PriceByRegion[]>(
-        '/api/insights/avg-price-by-region',
-    );
+    const response = await fetch(baseUrl('/api/insights/avg-price-by-region'));
 
-    if (!data || data.length === 0)
-        throw new Error('No data available for the chart');
+    if (!response.ok) {
+        throw new Error('Failed to fetch data');
+    }
+
+    const data = (await response.json()) as PriceByRegion[];
 
     return <AvgPriceByRegionChart data={data} />;
 }

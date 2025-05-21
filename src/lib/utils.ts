@@ -92,6 +92,9 @@ const formatDateTime = (dateTime: string) => {
     };
 };
 
+const baseUrl = (url: string) =>
+    new URL(url || '', process.env.NEXT_PUBLIC_BASE_URL);
+
 export {
     cn,
     pollutionUnits,
@@ -100,4 +103,5 @@ export {
     formatAxiosError,
     retrieveInterval,
     formatDateTime,
+    baseUrl,
 };

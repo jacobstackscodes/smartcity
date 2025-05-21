@@ -2,15 +2,23 @@ import {
     type CrimeByCity,
     CrimeCountByCityChart,
 } from '@/components/insights/crime-by-city';
-import { req } from '@/lib/requests';
+import { baseUrl } from '@/lib/utils';
 
 export default async function Page() {
-    const { data } = await req.get<CrimeByCity[]>(
-        '/api/insights/count-by-city',
-    );
+    const response = await fetch(baseUrl('/api/insights/count-by-city'), {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        },
+    });
 
-    if (!data || data.length === 0)
-        throw new Error('No data available for the chart');
+    if (!response.ok) {
+        throw new Error('Failed to fetch data');
+    }
+
+    const data = (await response.json()) as CrimeByCity[];
 
     return <CrimeCountByCityChart data={data} />;
 }
