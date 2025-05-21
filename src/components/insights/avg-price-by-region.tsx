@@ -1,4 +1,15 @@
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+'use client';
+
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Legend,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from 'recharts';
 
 export type PriceByRegion = {
     _id: string;
@@ -10,7 +21,13 @@ export const AvgPriceByRegionChart = ({ data }: { data: PriceByRegion[] }) => (
         <ResponsiveContainer>
             <BarChart data={data}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="_id" angle={-30} textAnchor="end" interval={0} height={80} />
+                <XAxis
+                    dataKey="_id"
+                    angle={-30}
+                    textAnchor="end"
+                    interval={0}
+                    height={80}
+                />
                 <YAxis />
                 <Tooltip />
                 <Legend />
