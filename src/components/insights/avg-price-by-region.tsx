@@ -13,26 +13,44 @@ import {
 
 export type PriceByRegion = {
     _id: string;
-    avgPrice: number;
+    averagePrice: string;
 };
 
-export const AvgPriceByRegionChart = ({ data }: { data: PriceByRegion[] }) => (
-    <div className="h-[400px] w-full">
-        <ResponsiveContainer>
-            <BarChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                    dataKey="_id"
-                    angle={-30}
-                    textAnchor="end"
-                    interval={0}
-                    height={80}
-                />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="avgPrice" fill="#82ca9d" name="Avg Price" />
-            </BarChart>
-        </ResponsiveContainer>
-    </div>
-);
+const tooltipFormatter = (value: string, name: string) => {
+    if (name === 'Avg Price') {
+        return [`₹${Number.parseFloat(value).toFixed(2)}`, name];
+    }
+    return [value, name];
+};
+
+export const AvgPriceByRegionChart = ({ data }: { data: PriceByRegion[] }) => {
+    const chartData = data.map((item) => ({
+        ...item,
+        averagePrice: Number.parseFloat(item.averagePrice),
+    }));
+
+    return (
+        <div className="h-[400px] w-full">
+            <ResponsiveContainer>
+                <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                        dataKey="_id"
+                        angle={-30}
+                        textAnchor="end"
+                        interval={0}
+                        height={80}
+                    />
+                    <YAxis />
+                    <Tooltip formatter={tooltipFormatter} />
+                    <Legend />
+                    <Bar
+                        dataKey="averagePrice"
+                        fill="#82ca9d"
+                        name="Avg Price"
+                    />
+                </BarChart>
+            </ResponsiveContainer>
+        </div>
+    );
+};
