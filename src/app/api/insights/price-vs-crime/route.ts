@@ -1,12 +1,11 @@
-import { db } from '@/server/mongoose';
-import { House } from '@/server/schema/house';
+import { db } from "@/server/mongoose";
+import { House } from "@/server/schema/house";
+import { NextResponse } from "next/server";
 
 export async function GET() {
     const data = await db(async (conn) => {
         const house = House(conn);
-
-        return await house.aggregate([
-            // Group houses by region, calculating total price and count.
+        return house.aggregate([
             {
                 $group: {
                     _id: '$region',
@@ -14,16 +13,14 @@ export async function GET() {
                     houseCount: { $sum: 1 },
                 },
             },
-            // Lookup matching crimes from the crime collection (matching on region == city).
             {
                 $lookup: {
-                    from: 'crime', // the collection name in MongoDB (as defined in your schema file)
+                    from: 'crime',
                     localField: '_id',
                     foreignField: 'city',
                     as: 'crimeData',
                 },
             },
-            // Project the crime count along with region and average price.
             {
                 $project: {
                     _id: 0,
@@ -36,5 +33,7 @@ export async function GET() {
         ]);
     });
 
-    return Response.json(data);
+    return !data
+        ? NextResponse.json({ message: 'No data found' }, { status: 404 })
+        : NextResponse.json(data);
 }
