@@ -2,7 +2,7 @@ import { CrimeByCity, CrimeCountByCityChart } from "@/components/insights/crime-
 import axios from "axios";
 
 export default async function Page() {
-    const { data } = await axios.get<CrimeByCity[]>('http://localhost:3000/api/insights/{route-name}');
+    const { data } = await axios.get<CrimeByCity[]>('http://localhost:3000/api/insights/count-by-city');
 
     if (!data || data.length === 0)
         throw new Error('No data available for the chart');
