@@ -2,11 +2,11 @@ import {
     PriceVsCrimeChart,
     type PriceVsCrimeData,
 } from '@/components/insights/price-vs-crime-by-region';
-import axios from 'axios';
+import { req } from '@/lib/requests';
 
 export default async function Page() {
-    const { data } = await axios.get<PriceVsCrimeData[]>(
-        'http://localhost:3000/api/insights/price-vs-crime',
+    const { data } = await req.get<PriceVsCrimeData[]>(
+        '/api/insights/price-vs-crime',
     );
 
     if (!data || data.length === 0)

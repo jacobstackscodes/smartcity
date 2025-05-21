@@ -4,7 +4,7 @@ import type { LocationResponse } from '@/types/google-location';
 import type { AqiResponse } from '@/types/google-aqi';
 import { notFound } from 'next/navigation';
 
-const req = axios.create({
+export const req = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BASE_URL,
 });
 

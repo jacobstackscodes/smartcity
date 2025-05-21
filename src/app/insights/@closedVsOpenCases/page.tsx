@@ -2,11 +2,11 @@ import {
     CaseStatusChart,
     type CaseStatusData,
 } from '@/components/insights/closed-vs-open-cases';
-import axios from 'axios';
+import { req } from '@/lib/requests';
 
 export default async function Page() {
-    const { data } = await axios.get<CaseStatusData[]>(
-        'http://localhost:3000/api/insights/closed-vs-open-cases',
+    const { data } = await req.get<CaseStatusData[]>(
+        '/api/insights/closed-vs-open-cases',
     );
 
     if (!data || data.length === 0)

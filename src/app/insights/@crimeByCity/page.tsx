@@ -2,11 +2,11 @@ import {
     type CrimeByCity,
     CrimeCountByCityChart,
 } from '@/components/insights/crime-by-city';
-import axios from 'axios';
+import { req } from '@/lib/requests';
 
 export default async function Page() {
-    const { data } = await axios.get<CrimeByCity[]>(
-        'http://localhost:3000/api/insights/count-by-city',
+    const { data } = await req.get<CrimeByCity[]>(
+        '/api/insights/count-by-city',
     );
 
     if (!data || data.length === 0)
