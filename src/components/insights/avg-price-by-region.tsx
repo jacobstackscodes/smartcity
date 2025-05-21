@@ -35,7 +35,7 @@ export const AvgPriceByRegionChart = ({ data }: { data: PriceByRegion[] }) => {
                 <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
-                        dataKey="_id"
+                        dataKey="region"
                         angle={-30}
                         textAnchor="end"
                         interval={0}
